@@ -1,53 +1,45 @@
-const { ErrorCodes } = require('../../../logger/codes');
-const { MySQL, StringUtils, Logger } = require('../../../Utils');
+const { MySQL } = require('@database');
+const { Logger } = require('@logger');
+const { ErrorCodes } = require('@logger/codes');
+const { RouterUtils, StringUtils } = require('@utils');
+
 const express = require('express');
 const router = express.Router();
 
 router.post('/', async (req, res) => {
     const logger = new Logger("login", req.body);
-    const { token, deviceid, secure } = req.body;
 
-    if (!token || !deviceid || !secure) {
-        res.status(403).send(`Invalid Query`);
-        logger.setErrorCode(ErrorCodes.INVALID_QUERY);
-        logger.error(false);
+    if(!RouterUtils.isValidQuery(req.body, "token", "deviceid", "secure")) {
+        RouterUtils.invalidQuery(res, logger);
         return;
     }
+
+    const { token, deviceid, secure } = req.body;
 
     const secureString = StringUtils.getSecureString(token, deviceid, process.env.VERSION_NAME);
 
     if (secure != secureString) {
-        res.status(403).send(`Invalid Secure`);
-        logger.setErrorCode(ErrorCodes.INVALID_SECURE);
-        logger.error(false);
+        RouterUtils.invalidSecure(res, logger);
         return;
     }
 
     try {
         const checkToken = await MySQL.query(`SELECT uuid, deviceID, vaild, \`lock\` FROM token WHERE md5 = "${StringUtils.getSecureString(token)}";`);
         if (checkToken.length == 0) {
-            logger.setErrorCode(ErrorCodes.TOKEN_NOT_EXIST);
-            const log = logger.error(false);
-            res.send(log);
+            RouterUtils.fail(res, logger, ErrorCodes.TOKEN_NOT_EXIST);
             return;
         }
         if (checkToken.length >= 2) {
             await MySQL.query(`UPDATE token SET vaild = 0, \`lock\` = 1, expiredTime = UNIX_TIMESTAMP() WHERE deviceID = "${deviceid}";`);
-            logger.setErrorCode(ErrorCodes.ILLEGAL_LOGIN);
-            const log = logger.error(false);
-            res.send(log);
+            RouterUtils.fail(res, logger, ErrorCodes.ILLEGAL_LOGIN);
             return;
         }
         if (checkToken[0]["lock"] == 1) {
-            logger.setErrorCode(ErrorCodes.TOKEN_LOCKED);
-            const log = logger.error(false);
-            res.send(log);
+            RouterUtils.fail(res, logger, ErrorCodes.TOKEN_LOCKED);
             return;
         }
         if (checkToken[0]["vaild"] == 0) {
-            logger.setErrorCode(ErrorCodes.TOKEN_EXPIRED);
-            const log = logger.error(false);
-            res.send(log);
+            RouterUtils.fail(res, logger, ErrorCodes.TOKEN_EXPIRED);
             return;
         }
         if (checkToken[0]["deviceID"] != deviceid) {
@@ -56,9 +48,7 @@ router.post('/', async (req, res) => {
             }
             else {
                 await MySQL.query(`UPDATE token SET vaild = 0, \`lock\` = 1, expiredTime = UNIX_TIMESTAMP() WHERE md5 = "${StringUtils.getSecureString(token)}";`);
-                logger.setErrorCode(ErrorCodes.ILLEGAL_LOGIN);
-                const log = logger.error(false);
-                res.send(log);
+                RouterUtils.fail(res, logger, ErrorCodes.ILLEGAL_LOGIN);
                 return;
             }
         }
@@ -71,16 +61,11 @@ router.post('/', async (req, res) => {
             "staff": userInfo[0]["staff"] * 1,
             "discord_id": userInfo[0]["discord_id"]
         }
-        logger.setOutput(responseData);
-        const log = logger.success();
-        res.send(log);
+        RouterUtils.success(res, logger, responseData);
         return;
     }
     catch (e) {
-        logger.setErrorCode(ErrorCodes.INTERNAL_SERVER_ERROR);
-        logger.setErrorStack(e);
-        const log = logger.error(true);
-        res.status(500).send(log);
+        RouterUtils.internalError(res, logger, e);
         return;
     }
 });

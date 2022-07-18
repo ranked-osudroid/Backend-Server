@@ -1,32 +1,30 @@
-const { StringUtils, Logger, MySQL } = require('../../../Utils');
-const { ErrorCodes } = require('../../../logger/codes');
+const { MySQL } = require('@database');
+const { Logger } = require('@logger');
+const { ErrorCodes } = require('@logger/codes');
+const { RouterUtils, StringUtils } = require('@utils');
+
 const express = require('express');
 const router = express.Router();
 
 router.post('/', async (req, res) => {
     const logger = new Logger("createToken", req.body);
-    const { key, uuid } = req.body;
 
-    if (!key || !uuid) {
-        res.status(403).send(`Invalid Query`);
-        logger.setErrorCode(ErrorCodes.INVALID_QUERY);
-        logger.error(false);
+    if(!RouterUtils.isValidQuery(req.body, "key", "uuid")) {
+        RouterUtils.invalidQuery(res, logger);
         return;
     }
 
+    const { key, uuid } = req.body;
+
     if (key != process.env.KEY) {
-        res.status(403).send(`Invalid Key`);
-        logger.setErrorCode(ErrorCodes.INVALID_KEY);
-        logger.error(false);
+        RouterUtils.invalidKey(res, logger);
         return;
     }
 
     try {
         const userCheck = await MySQL.query(`SELECT uuid FROM user WHERE uuid = "${uuid}";`);
         if (userCheck.length == 0) {
-            logger.setErrorCode(ErrorCodes.USER_NOT_EXIST);
-            const log = logger.error(false);
-            res.send(log);
+            RouterUtils.fail(res, logger, ErrorCodes.USER_NOT_EXIST);
             return;
         }
         const vaildId = await MySQL.query(`SELECT md5 FROM token WHERE uuid = "${uuid}" AND vaild = 1;`);
@@ -43,17 +41,12 @@ router.post('/', async (req, res) => {
             let responseData = {
                 "id": id,
             }
-            logger.setOutput(responseData);
-            const log = logger.success();
-            res.send(log);
+            RouterUtils.success(res, logger, responseData);
             return;
         }
     }
     catch (e) {
-        logger.setErrorCode(ErrorCodes.INTERNAL_SERVER_ERROR);
-        logger.setErrorStack(e);
-        const log = logger.error(true);
-        res.status(500).send(log);
+        RouterUtils.internalError(res, logger, e);
         return;
     }
 });

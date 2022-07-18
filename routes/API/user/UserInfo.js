@@ -1,27 +1,30 @@
-const { MySQL, Logger } = require('../../../Utils');
-const { ErrorCodes } = require('../../../logger/codes');
+const { MySQL } = require('@database');
+const { Logger } = require('@logger');
+const { ErrorCodes } = require('@logger/codes');
+const { RouterUtils } = require('@utils');
+
 const express = require('express');
 const router = express.Router();
 
 router.post('/', async (req, res) => {
     const logger = new Logger("userInfo", req.body);
-    const { key, uuid, discordid, username } = req.body;
-    if (!key || !((uuid != undefined) ^ (discordid != undefined) ^ (username != undefined))) {
-        res.status(403).send(`Invalid Query`);
-        logger.setErrorCode(ErrorCodes.INVALID_QUERY);
-        logger.error(false);
-        return;
+
+    if(!RouterUtils.isValidQuery(req.body, "key") ||
+        (!RouterUtils.isValidQuery(req.body, "uuid")
+        && !RouterUtils.isValidQuery(req.body, "discordid")
+        && !RouterUtils.isValidQuery(req.body, "username"))) {
+            RouterUtils.invalidQuery(res, logger);
+            return;
     }
 
+    const { key, uuid, discordid, username } = req.body;
+
     if (key != process.env.KEY) {
-        res.status(403).send(`Invalid Key`);
-        logger.setErrorCode(ErrorCodes.INVALID_KEY);
-        logger.error(false);
+        RouterUtils.invalidKey(res, logger);
         return;
     }
 
     try {
-
         let query = ``;
         if(uuid != undefined) {
             query = `uuid = '${uuid}';`;
@@ -36,9 +39,7 @@ router.post('/', async (req, res) => {
         const search = await MySQL.query(`SELECT * FROM user WHERE ${query}`);
 
         if (search.length == 0) {
-            logger.setErrorCode(ErrorCodes.USER_NOT_EXIST);
-            const log = logger.error(false);
-            res.send(log);
+            RouterUtils.fail(res, logger, ErrorCodes.USER_NOT_EXIST);
             return;
         }
         const UUID = search[0]["uuid"];
@@ -67,16 +68,11 @@ router.post('/', async (req, res) => {
             "hasToken" : tokenSearch[0]["count"] * 1
         }
 
-        logger.setOutput(responseData);
-        const log = logger.success();
-        res.send(log);
+        RouterUtils.success(res, logger, responseData);
         return;
     }
     catch (e) {
-        logger.setErrorCode(ErrorCodes.INTERNAL_SERVER_ERROR);
-        logger.setErrorStack(e);
-        const log = logger.error(true);
-        res.status(500).send(log);
+        RouterUtils.internalError(res, logger, e);
         return;
     }
 });

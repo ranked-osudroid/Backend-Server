@@ -1,34 +1,33 @@
 const { MySQL, Logger, StringUtils, Utils } = require('../../../Utils');
 const { ErrorCodes } = require('../../../logger/codes');
+
+const { MySQL } = require('@database');
+const { Logger } = require('@logger');
+const { ErrorCodes } = require('@logger/codes');
+const { RouterUtils, StringUtils, Utils } = require('@utils');
+const { Tokens } = require('@database/mongodb/schemas');
+
 const express = require('express');
 const router = express.Router();
-const fs = require('fs');
-const { tokens } = require('../../database/mongodb').schemas;
 
 router.post('/', async (req, res) => {
     const logger = new Logger("TokenList", req.body);
-    const { key, uuid } = req.body;
 
-    if (!key || !uuid) {
-        res.status(403).send(`Invalid Query`);
-        logger.setErrorCode(ErrorCodes.INVALID_QUERY);
-        logger.error(false);
-        return;
+    if(!RouterUtils.isValidQuery(req.body, "key", "uuid")) {
+        RouterUtils.invalidQuery(res, logger);
     }
 
+    const { key, uuid } = req.body;
+
     if (key != process.env.KEY) {
-        res.status(403).send(`Invalid Key`);
-        logger.setErrorCode(ErrorCodes.INVALID_KEY);
-        logger.error(false);
+        RouterUtils.invalidKey(res, logger);
         return;
     }
 
     try {
         const deviceIDList = await MySQL.query(`SELECT deviceID FROM token WHERE uuid = '${uuid}';`);
         if (deviceIDList.length == 0) {
-            logger.setErrorCode(ErrorCodes.PLAYER_NO_TOKENS);
-            const log = logger.error(false);
-            res.send(log);
+            RouterUtils.fail(res, logger, ErrorCodes.PLAYER_NO_TOKENS);
             return;
         }
         let sql = `SELECT uuid, md5, vaild, \`lock\`, createdTime, expiredTime FROM token WHERE uuid = '${uuid}'`;
@@ -41,7 +40,7 @@ router.post('/', async (req, res) => {
         while(true) {
             let id = StringUtils.getAlphaNumericString(7);
             try {
-                await tokens.create({
+                await Tokens.create({
                     id: id,
                     createdTime: time,
                     tokens: tokenList
@@ -49,9 +48,7 @@ router.post('/', async (req, res) => {
                 const responseData = {
                     "id": id
                 }
-                logger.setOutput(responseData);
-                const log = logger.success();
-                res.send(log);
+                RouterUtils.success(res, logger, responseData);
                 return;
             }
             catch(e) {
@@ -60,10 +57,7 @@ router.post('/', async (req, res) => {
         }
     }
     catch (e) {
-        logger.setErrorCode(ErrorCodes.INTERNAL_SERVER_ERROR);
-        logger.setErrorStack(e);
-        const log = logger.error(true);
-        res.status(500).send(log);
+        RouterUtils.internalError(res, logger, e);
         return;
     }
 });

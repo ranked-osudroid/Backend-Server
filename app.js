@@ -3,17 +3,18 @@ let express = require('express');
 let path = require('path');
 let cookieParser = require('cookie-parser');
 let logger = require('morgan');
-let IpDeniedError = require('express-ipfilter').IpDeniedError;
-const { MySQL, StringUtils } = require('./Utils/');
+let { IpDeniedError } = require('express-ipfilter');
+const { StringUtils } = require('./Utils/');
 const mysql = require('mysql');
-const { connect } = require('./database/mongodb');
+const { MySQL, MongoDB } = require('@database');
 
 require('dotenv').config();
 
 /**
  * Connect to DB
  * */
-connect();
+MySQL.connect();
+MongoDB.connect();
 
 let indexRouter = require('./routes/index');
 const APIRouter = require('./API');
@@ -39,7 +40,7 @@ app.use('/tokenList', TokenRouter);
 app.disable('x-powered-by');
 
 // catch 404 and forward to error handler
-app.use(async function (req, res, next) {
+app.use((req, res, next) => {
 	console.log(`404 detected. IP : ${req.headers['x-forwarded-for']}`);
 	try {
 		MySQL.query(`INSERT INTO \`404Handle\`(\`id\`, \`method\`, \`ip\`, \`url\`, \`time\`) VALUES("${StringUtils.getAlphaNumericString(7)}", "${req.method}", "${req.headers['x-forwarded-for'].split(",")[0]}", "${mysql.escape(req.url)}", UNIX_TIMESTAMP());`);
@@ -52,7 +53,7 @@ app.use(async function (req, res, next) {
 });
 
 // error handler
-app.use(function (err, req, res, next) {
+app.use((err, req, res, next) => {
 	// set locals, only providing error in development
 	res.locals.message = err.message;
 	res.locals.error = req.app.get('env') === 'development' ? err : {};

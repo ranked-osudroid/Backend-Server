@@ -1,6 +1,6 @@
-const Utils = require('../utils/Utils');
+const { Utils } = require('@utils');
 const { StatusCodes } = require('./codes');
-const { logs, errors } = require('../database/mongodb').schemas;
+const { logs, errors } = require('@database/mongodb/schemas');
 
 class Logger {
 

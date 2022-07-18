@@ -1,6 +1,6 @@
 const fs = require('fs');
 const mime = require('mime');
-const { Logger } = require('../../Utils');
+const { Logger } = require('@logger');
 const { ErrorCodes } = require('../../logger/codes');
 const express = require('express');
 const router = express.Router();
