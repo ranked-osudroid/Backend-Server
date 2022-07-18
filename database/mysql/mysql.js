@@ -2,9 +2,9 @@ const mysql = require('mysql');
 
 let mysqlConnection;
 
-exports.query = (dbQuery) => {
+const query = (sql) => {
     return new Promise((resolve, reject) => {
-        mysqlConnection.query(dbQuery, (error, results, fields) => {
+        mysqlConnection.query(sql, (error, results, fields) => {
             if (error) {
                 console.log(error);
             }
@@ -41,3 +41,5 @@ const handleDisconnect = () => {
 }
 
 handleDisconnect();
+
+module.exports.query = query;

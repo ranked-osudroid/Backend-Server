@@ -1,5 +1,9 @@
-const { MySQL, Logger } = require('../../../Utils');
-const { ErrorCodes } = require('../../../logger/codes');
+const path = require('path');
+const { Logger } = require(path.join(__dirname, '/logger'));
+const { ErrorCodes } = require(path.join(__dirname, '/logger/codes'));
+const mysql = require(path.join(__dirname, 'database/mysql/mysql'));
+
+
 const express = require('express');
 const router = express.Router();
 

@@ -1,4 +1,4 @@
-const Utils = require('../Utils/Utils');
+const Utils = require('../utils/Utils');
 const { StatusCodes } = require('./codes');
 const { logs, errors } = require('../database/mongodb').schemas;
 
