@@ -1,6 +1,2 @@
-const MySQL = require('./mysql/MySQL');
-const MongoDB = require('./mongodb/MongoDB');
-
-module.exports = {
-    MySQL, MongoDB
-};
+export { MySQL } from './mysql/MySQL';
+export { MongoDB } from './mongodb/MongoDB';

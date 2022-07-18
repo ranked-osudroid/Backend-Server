@@ -1,4 +1,4 @@
-const { ErrorCodes } = require('@logger/codes');
+import { ErrorCodes } from '@logger/codes';
 
 exports.isValidQuery = (body, ...queryNames) => {
     for(let query of queryNames) {

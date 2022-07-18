@@ -44,4 +44,4 @@ const schema = new Schema({
     }
 });
 
-module.exports = mongoose.model('maps', schema);
+export const Maps = mongoose.model('maps', schema);

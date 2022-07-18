@@ -20,4 +20,4 @@ const schema = new Schema({
     }
 });
 
-module.exports = mongoose.model('logs', schema);
+export const Logs = mongoose.model('logs', schema);

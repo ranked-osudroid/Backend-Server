@@ -3,10 +3,11 @@ let express = require('express');
 let path = require('path');
 let cookieParser = require('cookie-parser');
 let logger = require('morgan');
-let { IpDeniedError } = require('express-ipfilter');
-const { StringUtils } = require('./Utils/');
 const mysql = require('mysql');
-const { MySQL, MongoDB } = require('@database');
+
+import { MySQL, MongoDB } from '@database';
+import { StringUtils } from '@utils';
+import { IpDeniedError } from 'express-ipfilter';
 
 require('dotenv').config();
 

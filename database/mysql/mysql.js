@@ -1,6 +1,6 @@
 const mysql = require('mysql');
 
-class MySQL {
+export class MySQL {
 
     static mysqlConnection;
 
@@ -42,5 +42,3 @@ class MySQL {
         });
     }
 }
-
-module.exports = MySQL;

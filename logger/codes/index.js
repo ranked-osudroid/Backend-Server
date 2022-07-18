@@ -1,6 +1,2 @@
-const StatusCodes = require('./Status');
-const ErrorCodes = require('./Errors');
-
-module.exports = {
-    StatusCodes, ErrorCodes
-}
+export { StatusCodes } from './Status';
+export { ErrorCodes } from './Errors';

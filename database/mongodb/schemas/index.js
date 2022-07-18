@@ -1,9 +1,5 @@
-const Errors = require('./logs/errors');
-const Logs = require('./logs/logs');
-const Tokens = require('./logs/tokens');
+export { Errors } from './logs/errors';
+export { Logs } from './logs/logs';
+export { Tokens } from './logs/errors';
 
-const Maps = require('./pools/maps');
-
-module.exports = {
-    Errors, Logs, Maps, Tokens
-};
+export { Maps } from './pools/maps';

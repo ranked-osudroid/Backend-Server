@@ -1,13 +1,10 @@
-const { MySQL, Logger, StringUtils, Utils } = require('../../../Utils');
-const { ErrorCodes } = require('../../../logger/codes');
+import { MySQL } from '@database';
+import { Logger } from '@logger';
+import { ErrorCodes } from '@logger/codes';
+import { RouterUtils, StringUtils, Utils } from '@utils';
+import { Tokens } from '@database/mongodb/schemas';
 
-const { MySQL } = require('@database');
-const { Logger } = require('@logger');
-const { ErrorCodes } = require('@logger/codes');
-const { RouterUtils, StringUtils, Utils } = require('@utils');
-const { Tokens } = require('@database/mongodb/schemas');
-
-const express = require('express');
+import * as express from 'express';
 const router = express.Router();
 
 router.post('/', async (req, res) => {

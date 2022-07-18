@@ -1,8 +1,10 @@
 const fs = require('fs');
 const mime = require('mime');
-const { Logger } = require('@logger');
-const { ErrorCodes } = require('../../logger/codes');
-const express = require('express');
+
+import { Logger } from '@logger';
+import { ErrorCodes } from '@logger/codes';
+
+import * as express from 'express';
 const router = express.Router();
 
 router.get('/', async (req, res) => {

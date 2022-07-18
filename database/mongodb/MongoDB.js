@@ -1,6 +1,6 @@
 const mongoose = require('mongoose');
 
-class MongoDB {
+export class MongoDB {
     static connect() {
         console.log(`Starting to connect MongoDB...`);
 
@@ -27,5 +27,3 @@ mongoose.connection.on('disconnected', () => {
     console.log(`The connection was disconnected. Try reconnecting...`);
     MongoDB.connect();
 });
-
-module.exports = MongoDB;

@@ -17,4 +17,4 @@ const schema = new Schema({
     }
 });
 
-module.exports = mongoose.model('tokens', schema);
+export const Tokens = mongoose.model('tokens', schema);

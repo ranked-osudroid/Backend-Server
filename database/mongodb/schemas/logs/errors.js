@@ -20,4 +20,4 @@ const schema = new Schema({
     }
 });
 
-module.exports = mongoose.model('errors', schema);
+export const Errors = mongoose.model('errors', schema);

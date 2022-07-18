@@ -1,8 +1,8 @@
-const { Utils } = require('@utils');
-const { StatusCodes } = require('./codes');
-const { logs, errors } = require('@database/mongodb/schemas');
+import { Utils } from '@utils';
+import { StatusCodes } from './codes';
+import { logs, errors } from '@database/mongodb/schemas';
 
-class Logger {
+export class Logger {
 
     /**
      * @params type : String | API names
@@ -90,5 +90,3 @@ class Logger {
         }
     }
 }
-
-module.exports = Logger;

@@ -1,4 +1,4 @@
-const codes = {
+export const ErrorCodes = {
     INVALID_KEY : 0,
     INVALID_QUERY : 1,
     INVALID_SECURE : 2,
@@ -22,5 +22,3 @@ const codes = {
     MATCH_NOT_END : 20,
     PROFILE_NO_CHANGE: 21
 };
-
-module.exports = codes;
