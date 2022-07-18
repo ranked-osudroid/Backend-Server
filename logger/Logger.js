@@ -1,17 +1,18 @@
-const fs = require('fs');
-const Utils = require('./Utils');
-const Stats = require('../codes/Status');
+const Utils = require('../Utils/Utils');
+const { StatusCodes } = require('./codes');
+const { logs, errors } = require('../database/mongodb').schemas;
 
 class Logger {
 
-    //String type
-    //Json input
+    /**
+     * @params type : String | API names
+     * @params input : Object | request body
+     */
     constructor(type, input) {
         this.type = type;
         this.input = input;
         this.output = null;
         this.time = Utils.getDate();
-        this.fileName = this.time + "_" + this.type + ".txt";
         this.errorCode = null;
         this.errorStack = null;
         console.log(`${this.type} is called! | Time : ${this.time}`);
@@ -19,40 +20,49 @@ class Logger {
 
     success = () => {
         const log = {
-            "status": Stats.SUCCESS,
-            "type": this.type,
-            "body": this.input,
-            "output": this.output,
-            "time": this.time
+            time: this.time,
+            type: this.type,
+            body: this.input,
+            output: this.output
         };
-        fs.writeFile(`./log/${this.fileName}`, JSON.stringify(log, null, "\t"), "utf-8", () => {
-            console.log(`Success! | Type : ${this.type} | LogFile : ${this.fileName}`);
-        });
+
+        // MongoDB에 비동기 로그 저장
+        logs.create(log);
+        
+        log["status"] = StatusCodes.SUCCESS;
         return log;
     }
 
     //boolean save
+    /**
+     * @param save : Boolean | if save is true, it will be logged to DB
+     */
     error = (save) => {
         const log = {
-            "status": Stats.FAILED,
-            "code" : this.errorCode,
-            "type": this.type,
-            "body": this.input,
-            "time": this.time
-        }
+            time: this.time,
+            type: this.type,
+            code: this.errorCode,
+            body: this.input
+        };
         if(save) {
-            fs.writeFile(`./error/${this.fileName}`, JSON.stringify(log, null, "\t") + (this.errorStack != null ? "\n\n\n" + this.errorStack : ""), "utf-8", (err) => {});
+
+            // MongoDB에 동기 로그 저장
+            const dbLog = await errors.create(log);
+            console.log(dbLog);
+
             console.log(`Error! | Type : ${this.type} | LogFile : ${this.fileName}`);
             console.log(this.errorStack);
         }
         else {
             console.log(`Error! | Type : ${this.type} | Code : ${this.errorCode}`);
         }
-        
+        log["status"] = StatusCodes.FAILED;
         return log;
     }
 
-    //int code
+    /**
+     * @param code : Integer
+     */
     setErrorCode = (code) => {
         this.errorCode = code;
     }

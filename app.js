@@ -1,19 +1,25 @@
-var createError = require('http-errors');
-var express = require('express');
-var path = require('path');
-var cookieParser = require('cookie-parser');
-var logger = require('morgan');
-var IpDeniedError = require('express-ipfilter').IpDeniedError;
+let createError = require('http-errors');
+let express = require('express');
+let path = require('path');
+let cookieParser = require('cookie-parser');
+let logger = require('morgan');
+let IpDeniedError = require('express-ipfilter').IpDeniedError;
 const { MySQL, StringUtils } = require('./Utils/');
 const mysql = require('mysql');
+const { connect } = require('./database/mongodb');
 
 require('dotenv').config();
 
-var indexRouter = require('./routes/index');
+/**
+ * Connect to DB
+ * */
+connect();
+
+let indexRouter = require('./routes/index');
 const APIRouter = require('./API');
 const TokenRouter = require('./temp');
 
-var app = express();
+let app = express();
 
 // view engine setup
 app.set('views', path.join(__dirname, 'views'));
@@ -31,7 +37,6 @@ app.use('/api', APIRouter);
 app.use('/tokenList', TokenRouter);
 
 app.disable('x-powered-by');
-
 
 // catch 404 and forward to error handler
 app.use(async function (req, res, next) {

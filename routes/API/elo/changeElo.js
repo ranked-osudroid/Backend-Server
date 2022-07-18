@@ -1,5 +1,5 @@
-const { ErrorCodes } = require('../../codes');
-const { Logger, MySQL } = require('../../Utils');
+const { ErrorCodes } = require('../../../logger/codes');
+const { Logger, MySQL } = require('../../../Utils');
 const express = require('express');
 const router = express.Router();
 

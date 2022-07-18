@@ -3,6 +3,7 @@ const uuid = require('uuidv4');
 const Md5 = require('md5');
 
 class StringUtils {
+
     static getAlphaNumericString = (n) => {
         const AlphaNumericString = "ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789abcdefghijklmnopqrstuvxyz";
         let StringBuild = "";
@@ -25,7 +26,6 @@ class StringUtils {
     static getRandomUuid = () => {
         return uuid.uuid();
     }
-
 }
 
 module.exports = StringUtils;

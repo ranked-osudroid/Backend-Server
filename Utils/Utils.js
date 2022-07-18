@@ -1,4 +1,5 @@
 class Utils {
+    
     static getDate = () => {
         const time = Math.floor(Date.now() / 1000);
         return this.timestampToString(time);
@@ -12,7 +13,12 @@ class Utils {
         const hour = "0" + date.getHours();
         const minute = "0" + date.getMinutes();
         const second = "0" + date.getSeconds();
-        return year + "-" + month.substring(-2) + "-" + day.substring(-2) + "_" + hour.substring(-2) + ":" + minute.substring(-2) + ":" + second.substring(-2);
+        return year + "-"
+            + month.substr(-2) + "-"
+            + day.substr(-2) + "_"
+            + hour.substr(-2) + ":"
+            + minute.substr(-2) + ":"
+            + second.substr(-2);
     }
 
     static getUnixTime = () => {
