@@ -37,7 +37,7 @@ class Logger {
     /**
      * @param save : Boolean | if save is true, it will be logged to DB
      */
-    error = (save) => {
+    error = async (save) => {
         const log = {
             time: this.time,
             type: this.type,
