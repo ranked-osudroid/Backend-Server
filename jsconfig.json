@@ -8,6 +8,6 @@
         }
     },
     "exclude": [
-        "node_modules",
+        "views", "verify_beatmap", "assets", "bin"
     ]
 }

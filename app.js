@@ -1,15 +1,21 @@
-let createError = require('http-errors');
-let express = require('express');
-let path = require('path');
-let cookieParser = require('cookie-parser');
-let logger = require('morgan');
-const mysql = require('mysql');
+import * as register from 'module-alias/register.js';
+register();
+import * as createError from 'http-errors';
+import * as express from 'express';
+import * as path from 'path';
+import * as cookieParser from 'cookie-parser';
+import * as logger from 'morgan';
+import * as mysql from 'mysql';
+import * as dotenv from 'dotenv';
 
 import { MySQL, MongoDB } from '@database';
 import { StringUtils } from '@utils';
 import { IpDeniedError } from 'express-ipfilter';
 
-require('dotenv').config();
+/**
+ * env init
+ */
+dotenv.config();
 
 /**
  * Connect to DB

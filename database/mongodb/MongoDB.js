@@ -1,6 +1,6 @@
 const mongoose = require('mongoose');
 
-export class MongoDB {
+export default class MongoDB {
     static connect() {
         console.log(`Starting to connect MongoDB...`);
 

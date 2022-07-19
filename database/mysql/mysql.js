@@ -1,6 +1,6 @@
-const mysql = require('mysql');
+import * as mysql from 'mysql';
 
-export class MySQL {
+export default class MySQL {
 
     static mysqlConnection;
 
