@@ -17,4 +17,4 @@ const schema = new Schema({
     }
 });
 
-export const Tokens = mongoose.model('tokens', schema);
+export default mongoose.model('tokens', schema);

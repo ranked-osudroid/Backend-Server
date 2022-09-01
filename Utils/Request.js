@@ -1,36 +1,35 @@
-const axios = require('axios');
-const { Logger } = require('../logger');
+import * as axios from 'axios';
+import { Logger } from '#logger';
 
-class Request {
+export class Request {
 
-  constructor(url, body) {
-    this.url = url;
-    if(body != undefined) {
-      this.body = body;
+    constructor(url, body) {
+        this.url = url;
+        if (body != undefined) {
+            this.body = body;
+        }
     }
-  }
 
-  sendRequest = async () => {
-    try {
-      const res = await axios.get(this.url);
-      return res["data"];
-  
-    } catch (error) {
-      Logger.printStackTrace(error);
+    sendRequest = async () => {
+        try {
+            const res = await axios.get(this.url);
+            return res["data"];
+        }
+        catch (e) {
+            Logger.printStackTrace(e);
+        }
     }
-  }
 
-  sendPost = async (body) => {
-    try {
-      const res = await axios.post(this.url, body);
-      return res["data"];
-  
-    } catch (error) {
-      Logger.printStackTrace(error);
-      throw new Error("Could you check if the body is defined?");
+    sendPost = async (body) => {
+        try {
+            const res = await axios.post(this.url, body);
+            return res["data"];
+
+        }
+        catch (e) {
+            Logger.printStackTrace(e);
+            throw new Error("Could you check if the body is defined?");
+        }
     }
-  }
-  
+
 }
-
-module.exports = Request;

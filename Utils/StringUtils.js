@@ -1,8 +1,8 @@
-const Base64 = require('js-base64');
-const uuid = require('uuidv4');
-const Md5 = require('md5');
+import * as Base64 from 'js-base64';
+import * as uuid from 'uuidv4';
+import * as Md5 from 'md5';
 
-class StringUtils {
+export default class StringUtils {
 
     static getAlphaNumericString = (n) => {
         const AlphaNumericString = "ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789abcdefghijklmnopqrstuvxyz";
@@ -27,5 +27,3 @@ class StringUtils {
         return uuid.uuid();
     }
 }
-
-module.exports = StringUtils;

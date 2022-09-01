@@ -1,5 +1,3 @@
-import * as register from 'module-alias/register.js';
-register();
 import * as createError from 'http-errors';
 import * as express from 'express';
 import * as path from 'path';
@@ -8,9 +6,10 @@ import * as logger from 'morgan';
 import * as mysql from 'mysql';
 import * as dotenv from 'dotenv';
 
-import { MySQL, MongoDB } from '@database';
-import { StringUtils } from '@utils';
 import { IpDeniedError } from 'express-ipfilter';
+
+import { MySQL, MongoDB } from '#database';
+import { StringUtils } from '#utils';
 
 /**
  * env init
@@ -23,11 +22,11 @@ dotenv.config();
 MySQL.connect();
 MongoDB.connect();
 
-let indexRouter = require('./routes/index');
-const APIRouter = require('./API');
-const TokenRouter = require('./temp');
+import * as indexRouter from '#routes';
+import * as APIRouter from '#routes';
+import * as TokenRouter from '#temp';
 
-let app = express();
+const app = express();
 
 // view engine setup
 app.set('views', path.join(__dirname, 'views'));

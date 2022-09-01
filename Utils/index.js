@@ -1,13 +1,4 @@
-const Utils = require('./Utils');
-const StringUtils = require('./StringUtils');
-const Request = require('./Request');
-const getNickName = require('./getNickname');
-const RouterUtils = require('./RouterUtils');
-
-module.exports = {
-    Utils,
-    StringUtils,
-    Request,
-    getNickName,
-    RouterUtils
-};
+export * as Utils from './Utils';
+export * as StringUtils from './StringUtils';
+export * from './RouterUtils';
+export * from './Request';

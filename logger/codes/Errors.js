@@ -1,4 +1,4 @@
-export const ErrorCodes = {
+export default ErrorCodes = {
     INVALID_KEY : 0,
     INVALID_QUERY : 1,
     INVALID_SECURE : 2,

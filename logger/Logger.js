@@ -1,8 +1,8 @@
-import { Utils } from '@utils';
+import { Utils } from '#utils';
 import { StatusCodes } from './codes';
 import { logs, errors } from '@database/mongodb/schemas';
 
-export class Logger {
+export default class Logger {
 
     /**
      * @params type : String | API names

@@ -1,4 +1,4 @@
-class Utils {
+export default class Utils {
     
     static getDate = () => {
         const time = Math.floor(Date.now() / 1000);
@@ -66,6 +66,10 @@ class Utils {
                 return -1; 
         }
     }
-}
 
-module.exports = Utils;
+    static getNickname = async (uid) => {
+        const request = new Request(`http://ops.dgsrz.com/profile.php?uid=${uid}`);
+        const username = await request.sendRequest().split("<div class=\"h3 m-t-xs m-b-xs\">")[1].split("<")[0];
+        return username;
+    }
+}

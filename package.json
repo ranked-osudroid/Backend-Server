@@ -1,6 +1,14 @@
 {
     "name": "ranked_osudroid_backend",
     "version": "2.0.0",
+    "imports": {
+        "#database": "./database/index.js",
+        "#logger": "./logger/index.js",
+        "#utils": "./utils/index.js",
+        "#routes": "./routes/index.js",
+        "#codes": "./logger/codes/index.js",
+        "#schemas": "./database/schemas/index.js"
+    },
     "scripts": {
         "start": "node app.js"
     },
@@ -20,8 +28,7 @@
         "morgan": "~1.9.1",
         "mysql": "^2.18.1",
         "pug": "2.0.0-beta11",
-        "uuidv4": "^6.2.12",
-        "module-alias": "^2.2.2"
+        "uuidv4": "^6.2.12"
     },
     "type": "module"
 }

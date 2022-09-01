@@ -1,2 +1,4 @@
-export { StatusCodes } from './Status';
-export { ErrorCodes } from './Errors';
+import ErrorCodes from './Errors';
+import StatusCodes from './Status';
+
+export { ErrorCodes, StatusCodes };

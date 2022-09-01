@@ -1,28 +1,23 @@
-// const { ErrorCodes } = require('../../../logger/codes');
-// const { MySQL, StringUtils, Logger, Utils } = require('../../../Utils');
-// const express = require('express');
-// const router = express.Router();
-
-import { StringUtils, Utils } from '@utils';
-import {  } from '@database'
-
+import { StringUtils, Utils, RouterUtils } from '@utils';
+import { MySQL } from '@database';
 import { Logger } from '@logger';
+import { ErrorCodes } from '@logger/codes';
+
+import * as express from 'express';
+const router = express.Router();
 
 router.post('/', async (req, res) => {
     const logger = new Logger("register", req.body);
-    const { key, discord_id, uid, name, rank, profile } = req.body;
 
-    if (!key || !discord_id || !uid || !name || !rank || !profile) {
-        res.status(403).send(`Invalid Query`);
-        logger.setErrorCode(ErrorCodes.INVALID_QUERY);
-        logger.error(false);
+    if(!RouterUtils.isValidQuery(req.body, "key", "discord_id", "uid", "name", "rank", "profile")) {
+        RouterUtils.invalidQuery(res, logger);
         return;
     }
 
+    const { key, discord_id, uid, name, rank, profile } = req.body;
+
     if (key != process.env.KEY) {
-        res.status(403).send(`Invalid Key`);
-        logger.setErrorCode(ErrorCodes.INVALID_KEY);
-        logger.error(false);
+        RouterUtils.invalidKey(res, logger);
         return;
     }
 
@@ -46,26 +41,19 @@ router.post('/', async (req, res) => {
             let responseData = {
                 "message": "Successfully registered the user."
             }
-            logger.setOutput(responseData);
-            const log = logger.success();
-            res.send(log);
+            RouterUtils.success(res, logger, responseData);
             return;
 
         }
         else {
-            logger.setErrorCode(ErrorCodes.ALREADY_REGISTERED);
-            const log = logger.error(false);
-            res.send(log);
+            RouterUtils.fail(res, logger, ErrorCodes.ALREADY_REGISTERED);
             return;
         }
     }
     catch (e) {
-        logger.setErrorCode(ErrorCodes.INTERNAL_SERVER_ERROR);
-        logger.setErrorStack(e);
-        const log = logger.error(true);
-        res.status(500).send(log);
+        RouterUtils.internalError(res, logger, e);
         return;
     }
 });
 
-module.exports = router;
+export default router;

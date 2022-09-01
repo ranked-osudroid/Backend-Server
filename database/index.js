@@ -1,2 +1,2 @@
-export { MySQL } from './mysql/MySQL';
-export { MongoDB } from './mongodb/MongoDB';
+export * as MySQL from './mysql/MySQL';
+export * as MongoDB from './mongodb/MongoDB';

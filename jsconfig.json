@@ -1,13 +1,13 @@
 {
     "compilerOptions": {
-        "module": "ES2022",
-        "target": "es6",
-        "baseUrl": ".",
+        "baseUrl": "./",
         "paths": {
-            "@*": ["./*"] 
+            "#*": ["./*"],
+            "#codes" : ["./logger/codes/index.js"],
+            "#schemas" : ["./database/schemas/index.js"]
         }
     },
     "exclude": [
-        "views", "verify_beatmap", "assets", "bin"
+        "node-modules"
     ]
 }
