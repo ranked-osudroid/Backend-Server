@@ -1,2 +1,2 @@
-export { default as MySQL } from './mysql/MySQL';
-export { default as MongoDB } from './mongodb/MongoDB';
+export { default as MySQL } from './mysql/MySQL.js';
+export { default as MongoDB } from './mongodb/MongoDB.js';

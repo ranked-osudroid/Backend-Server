@@ -11,6 +11,8 @@ import { IpDeniedError } from 'express-ipfilter';
 import { MySQL, MongoDB } from '#database';
 import { StringUtils } from '#utils';
 
+import mainRouter from '#routes';
+
 /**
  * env init
  */
@@ -21,10 +23,6 @@ dotenv.config();
  * */
 MySQL.connect();
 MongoDB.connect();
-
-import * as indexRouter from '#routes';
-import * as APIRouter from '#routes';
-import * as TokenRouter from '#temp';
 
 const app = express();
 
@@ -38,10 +36,8 @@ app.use(express.urlencoded({ extended: false }));
 app.use(cookieParser());
 app.use(express.static(path.join(__dirname, 'public')));
 
-app.use('/', indexRouter);
+app.use('/', mainRouter);
 app.use('/assets', express.static('./assets'));
-app.use('/api', APIRouter);
-app.use('/tokenList', TokenRouter);
 
 app.disable('x-powered-by');
 
@@ -74,4 +70,6 @@ app.use((err, req, res, next) => {
 	}
 });
 
-module.exports = app;
+app.listen(process.env.WEB_PORT, (req, res) => {
+	console.log(`Web server is now listening on port ${process.env.WEB_PORT}!`);
+});
