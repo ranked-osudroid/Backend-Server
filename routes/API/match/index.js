@@ -1,9 +1,9 @@
-const createMatch = require('./createMatch');
-const endMatch = require('./endMatch');
-const addRound = require('./addRound');
-const getMatch = require('./getMatch');
+import createMatch from './CreateMatch';
+import endMatch from './EndMatch';
+import addRound from './AddRound';
+import getMatch from './GetMatch';
 
-const express = require('express');
+import * as express from 'express';
 const router = express.Router();
 
 router.use('/createMatch', createMatch);
@@ -11,4 +11,4 @@ router.use('/endMatch', endMatch);
 router.use('/addRound', addRound);
 router.use('/getMatch', getMatch);
 
-module.exports = router;
+export default router;

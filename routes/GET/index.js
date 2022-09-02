@@ -1,5 +1,5 @@
-const discord = require('./discord');
-const verification = require('./verification');
+const discord = require('./Discord');
+const verification = require('./Verification');
 
 const express = require('express');
 const router = express.Router();

@@ -1,50 +1,42 @@
-import { MySQL } from '@database';
-import { Logger } from '@logger';
-import { ErrorCodes } from '@logger/codes';
-import { RouterUtils, Utils } from '@utils';
+import { MySQL } from '#database';
+import Logger from '#logger';
+import { ErrorCodes } from '#codes';
+import { RouterUtils, Utils } from '#utils';
 
 import * as express from 'express';
 const router = express.Router();
 
 router.post('/', async (req, res) => {
     const logger = new Logger("addRound", req.body);
+
+    if(!RouterUtils.isValidQuery(req.body, "key", "draw", "startedTime", "matchId", "mapid", "mapsetid", "mapset", "bluePlayID", "redPlayID")) {
+        RouterUtils.invalidQuery(res, logger);
+        return;
+    }
+
     const { key, draw, startedTime, matchId, mapid, mapsetid, mapset, bluePlayID, redPlayID  } = req.body;
 
-    if (!key || !draw || !startedTime || !matchId || !mapid || !mapsetid || !mapset || !bluePlayID || !redPlayID) {
-        res.status(403).send(`Invalid Query`);
-        logger.setErrorCode(ErrorCodes.INVALID_QUERY);
-        logger.error(false);
+    if(key != process.env.KEY) {
+        RouterUtils.invalidKey(res, logger);
         return;
     }
 
-    if (key != process.env.KEY) {
-        res.status(403).send(`Invalid Key`);
-        logger.setErrorCode(ErrorCodes.INVALID_KEY);
-        logger.error(false);
-        return;
-    }
     try {
         const findMatch = await MySQL.query(`SELECT * FROM matches WHERE match_id = '${matchId}';`);
 
         if(findMatch.length == 0) {
-            logger.setErrorCode(ErrorCodes.MATCH_NOT_EXIST);
-            const log = logger.error(false);
-            res.send(log);
+            RouterUtils.fail(res, logger, ErrorCodes.MATCH_NOT_EXIST);
             return;
         }
         if(findMatch[0]["ended_time"] != -1 || findMatch[0]["aborted"] == 1) {
-            logger.setErrorCode(ErrorCodes.MATCH_ALREADY_END);
-            const log = logger.error(false);
-            res.send(log);
+            RouterUtils.fail(res, logger, ErrorCodes.MATCH_ALREADY_END);
             return;
         }
 
         const findPlayIDs = await MySQL.query(`SELECT id FROM results WHERE id = '${bluePlayID}' OR id = '${redPlayID}';`);
 
         if(findPlayIDs.length < 2) {
-            logger.setErrorCode(ErrorCodes.PLAYID_NOT_FOUND);
-            const log = logger.error(false);
-            res.send(log);
+            RouterUtils.fail(res, logger, ErrorCodes.PLAYID_NOT_FOUND);
             return;
         }
  
@@ -82,18 +74,13 @@ router.post('/', async (req, res) => {
                 responseData["redScore"]++;
                 break;
         }
-
-        logger.setOutput(responseData);
-        const log = logger.success();
-        res.send(log);
+        RouterUtils.success(res, logger, responseData);
+        return;
     }
     catch (e) {
-        logger.setErrorCode(ErrorCodes.INTERNAL_SERVER_ERROR);
-        logger.setErrorStack(e);
-        const log = logger.error(true);
-        res.status(500).send(log);
+        RouterUtils.internalError(res, logger, e);
         return;
     }
 });
 
-module.exports = router;
+export default router;

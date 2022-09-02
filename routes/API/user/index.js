@@ -1,20 +1,10 @@
-const login = require('./Login');
-const register = require('./Register');
-const userinfo = require('./UserInfo');
-const tokenList = require('./TokenList');
-const banPlayer = require('./BanPlayer');
-const createToken = require('./CreateToken');
-const profileUpdate = require('./ProfileUpdate');
+import profileUpdate from './ProfileUpdate';
+import userInfo from './UserInfo';
 
-const express = require('express');
+import * as express from 'express';
 const router = express.Router();
 
-router.use('/login', login);
-router.use('/register', register);
-router.use('/userInfo', userinfo);
-router.use('/tokenList', tokenList);
-router.use('/banPlayer', banPlayer);
-router.use('/createToken', createToken);
+router.use('/userInfo', userInfo);
 router.use('/profileUpdate', profileUpdate);
 
-module.exports = router;
+export default router;

@@ -7,7 +7,7 @@
         "#utils": "./utils/index.js",
         "#routes": "./routes/index.js",
         "#codes": "./logger/codes/index.js",
-        "#schemas": "./database/schemas/index.js"
+        "#schemas": "./database/mongodb/schemas/index.js"
     },
     "scripts": {
         "start": "node app.js"

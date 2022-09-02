@@ -1,24 +1,30 @@
-const { ErrorCodes } = require('../../../logger/codes');
-const { StringUtils, Logger, MySQL } = require('../../../Utils');
-const express = require('express');
+import { RouterUtils, StringUtils } from '#utils';
+import Logger from '#logger';
+import { MySQL } from '#database';
+
+import * as express from 'express';
 const router = express.Router();
 
 router.post('/', async (req, res) => {
     const logger = new Logger("createMatch", req.body);
-    const { key, uuid1, uuid2, mappoolUUID } = req.body;
-    let matchId = StringUtils.getAlphaNumericString(7);
-
-    if (!key || !uuid1 || !uuid2) {
-        res.status(403).send(`Invalid Query`);
-        logger.setErrorCode(ErrorCodes.INVALID_QUERY);
-        logger.error(false);
+    
+    if(!RouterUtils.isValidQuery(req.body, "key", "uuid1", "uuid2")) {
+        RouterUtils.invalidQuery(res, logger);
         return;
     }
 
+    /*
+     * mappoolUUID 가 undefined 가 되도 되는 이유?
+     * mappoolUUID 가 undefined 면 서버에서 임의적으로 맵풀을 정하고
+     * undefined 가 아니면 듀얼에서 uuid 를 임의적으로 넣어서 원하는
+     * 맵풀로 플레이 하는 것
+     */
+
+    const { key, uuid1, uuid2, mappoolUUID } = req.body;
+    let matchId = StringUtils.getAlphaNumericString(7);
+
     if (key != process.env.KEY) {
-        res.status(403).send(`Invalid Key`);
-        logger.setErrorCode(ErrorCodes.INVALID_KEY);
-        logger.error(false);
+        RouterUtils.invalidKey(res, logger);
         return;
     }
 
@@ -53,17 +59,13 @@ router.post('/', async (req, res) => {
             "matchId" : matchId,
             "mappool" : mappool
         }
-        logger.setOutput(responseData);
-        const log = logger.success();
-        res.send(log);
+        RouterUtils.success(res, logger, responseData);
+        return;
     }
     catch (e) {
-        logger.setErrorCode(ErrorCodes.INTERNAL_SERVER_ERROR);
-        logger.setErrorStack(e);
-        const log = logger.error(true);
-        res.status(500).send(log);
+        RouterUtils.internalError(res, logger, e);
         return;
     }
 });
 
-module.exports = router;
+export default router;

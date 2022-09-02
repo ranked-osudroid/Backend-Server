@@ -1,8 +1,8 @@
-const fs = require('fs');
-const mime = require('mime');
+import * as fs from 'fs';
+import * as mime from 'mime';
 
-import { Logger } from '@logger';
-import { ErrorCodes } from '@logger/codes';
+import Logger from '#logger';
+import { ErrorCodes } from '#codes';
 
 import * as express from 'express';
 const router = express.Router();
@@ -28,4 +28,4 @@ router.get('/', async (req, res) => {
     }
 });
 
-module.exports = router;
+export default router;

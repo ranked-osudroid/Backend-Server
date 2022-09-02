@@ -1,7 +1,11 @@
-const express = require('express');
-const router = express.Router();
-const { Logger } = require('../Utils');
-const { tokens } = require('../database/mongodb').schemas;
+// const express = require('express');
+// const router = express.Router();
+// const { Logger } = require('../../Utils');
+// // const { tokens } = require('../database/mongodb').schemas;
+
+import Logger from '#logger';
+import { RouterUtils } from '#utils';
+import { Tokens } from '#schemas';
 
 router.get('/', async (req, res) => {
     try {

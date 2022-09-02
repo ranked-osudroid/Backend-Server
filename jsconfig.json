@@ -4,7 +4,7 @@
         "paths": {
             "#*": ["./*"],
             "#codes" : ["./logger/codes/index.js"],
-            "#schemas" : ["./database/schemas/index.js"]
+            "#schemas" : ["./database/mongodb/schemas/index.js"]
         }
     },
     "exclude": [

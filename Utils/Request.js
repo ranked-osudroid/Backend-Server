@@ -1,7 +1,7 @@
 import * as axios from 'axios';
-import { Logger } from '#logger';
+import Logger from '#logger';
 
-export class Request {
+export default class Request {
 
     constructor(url, body) {
         this.url = url;

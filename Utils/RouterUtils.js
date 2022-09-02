@@ -1,4 +1,4 @@
-import { ErrorCodes } from '#logger';
+import { ErrorCodes } from '#codes';
 
 export const isValidQuery = (body, ...queryNames) => {
     for(let query of queryNames) {

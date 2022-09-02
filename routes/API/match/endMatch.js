@@ -1,73 +1,58 @@
-const { ErrorCodes } = require('../../../logger/codes');
-const { Logger, MySQL, Utils } = require('../../../Utils');
-const express = require('express');
+import { ErrorCodes } from '#codes';
+import Logger from '#logger';
+import { RouterUtils, Utils } from '#utils';
+import { MySQL } from '#database';
+
+import * as express from 'express';
 const router = express.Router();
 
 router.post('/', async (req, res) => {
     const logger = new Logger("endMatch", req.body);
-    const { key, matchId, aborted } = req.body;
 
-    if (!key || !matchId || !aborted) {
-        res.status(403).send(`Invalid Query`);
-        logger.setErrorCode(ErrorCodes.INVALID_QUERY);
-        logger.error(false);
+    if(!RouterUtils.isValidQuery(req.body, "key", "matchId", "aborted")) {
+        RouterUtils.invalidQuery(res, logger);
         return;
     }
 
+    const { key, matchId, aborted } = req.body;
+
     if (key != process.env.KEY) {
-        res.status(403).send(`Invalid Key`);
-        logger.setErrorCode(ErrorCodes.INVALID_KEY);
-        logger.error(false);
+        RouterUtils.invalidKey(res, logger);
         return;
     }
 
     try {
         const searchMatch = await MySQL.query(`SELECT * FROM matches WHERE match_id = '${matchId}';`);
         if(searchMatch.length == 0) {
-            logger.setErrorCode(ErrorCodes.MATCH_NOT_EXIST);
-            const log = logger.error(false);
-            res.send(log);
+            RouterUtils.fail(res, logger, ErrorCodes.MATCH_NOT_EXIST);
             return;
         }
 
         if(searchMatch[0]["ended_time"] != -1) {
-            logger.setErrorCode(ErrorCodes.MATCH_ALREADY_END);
-            const log = logger.error(false);
-            res.send(log);
+            RouterUtils.fail(res, logger, ErrorCodes.MATCH_ALREADY_END);
             return;
         }
 
         const unixTime = Utils.getUnixTime();
+        let responseData = {
+            "aborted" : aborted == 1 ? 1 : 0,
+            "endedTime" : unixTime
+        };
 
         if(aborted == 1) {
-            
             await MySQL.query(`UPDATE matches SET aborted = 1, ended_time = ${unixTime} WHERE match_id = '${matchId}';`);
-            let responseData = {
-                "aborted" : 1,
-                "endedTime" : unixTime
-            }
-            logger.setOutput(responseData);
-            const log = logger.success();
-            res.send(log);
-            return;
         }
-
-        await MySQL.query(`UPDATE matches SET ended_time = ${unixTime} WHERE match_id = '${matchId}';`);
-        let responseData = {
-            "aborted" : 0,
-            "endedTime" : unixTime
+        else {
+            await MySQL.query(`UPDATE matches SET ended_time = ${unixTime} WHERE match_id = '${matchId}';`);
         }
-        logger.setOutput(responseData);
-        const log = logger.success();
-        res.send(log);
+        
+        RouterUtils.success(res, logger, responseData);
+        return;
     }
     catch (e) {
-        logger.setErrorCode(ErrorCodes.INTERNAL_SERVER_ERROR);
-        logger.setErrorStack(e);
-        const log = logger.error(true);
-        res.status(500).send(log);
+        RouterUtils.internalError(res, logger, e);
         return;
     }
 });
 
-module.exports = router;
+export default router;

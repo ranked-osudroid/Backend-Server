@@ -1,6 +1,6 @@
 import { Utils } from '#utils';
-import { StatusCodes } from './codes';
-import { logs, errors } from '@database/mongodb/schemas';
+import { StatusCodes } from '#codes';
+import * as schemas from '#schemas';
 
 export default class Logger {
 
@@ -27,8 +27,9 @@ export default class Logger {
         };
 
         // MongoDB에 비동기 로그 저장
-        logs.create(log);
-        
+        Logs.create(log);
+        schemas
+    
         log["status"] = StatusCodes.SUCCESS;
         return log;
     }

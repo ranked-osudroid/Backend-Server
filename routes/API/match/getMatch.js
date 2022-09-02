@@ -1,90 +1,68 @@
-const { ErrorCodes } = require('../../../logger/codes');
-const { Logger, MySQL, Utils } = require('../../../Utils');
-const express = require('express');
+import { RouterUtils, Utils } from '#utils';
+import Logger from '#logger';
+import { MySQL } from '#database';
+import { ErrorCodes } from '#codes';
+
+import * as express from 'express';
 const router = express.Router();
 
 router.post('/', async (req, res) => {
     const logger = new Logger("getMatch", req.body);
-    const { key, matchId  } = req.body;
 
-    if (!key || !matchId) {
-        res.status(403).send(`Invalid Query`);
-        logger.setErrorCode(ErrorCodes.INVALID_QUERY);
-        logger.error(false);
+    if (!RouterUtils.isValidQuery(req.body, "key", "matchId")) {
+        RouterUtils.invalidQuery(res, logger);
         return;
     }
+
+    const { key, matchId } = req.body;
 
     if (key != process.env.KEY) {
-        res.status(403).send(`Invalid Key`);
-        logger.setErrorCode(ErrorCodes.INVALID_KEY);
-        logger.error(false);
+        RouterUtils.invalidKey(res, logger);
         return;
     }
+    
     try {
-
-        let match = {
-            "id" : "",
-            "startedTime" : "",
-            "endedTime" : "",
-            "blueUUID" : "",
-            "redUUID" : "",
-            "blueName" : "",
-            "redName" : "",
-            "blueScore" : "",
-            "redScore" : "",
-            "mappool" : "",
-            "aborted" : "",
-            "rounds" : [
-
-            ]
-        }
         const findMatch = await MySQL.query(`SELECT * FROM matches WHERE match_id = '${matchId}';`);
 
         if(findMatch.length == 0) {
-            logger.setErrorCode(ErrorCodes.MATCH_NOT_EXIST);
-            const log = logger.error(false);
-            res.send(log);
+            RouterUtils.fail(res, logger, ErrorCodes.MATCH_NOT_EXIST);
             return;
         }
 
         if(findMatch[0]["ended_time"] == -1) {
-            logger.setErrorCode(ErrorCodes.MATCH_NOT_END);
-            const log = logger.error(false);
-            res.send(log);
+            RouterUtils.fail(res, logger, ErrorCodes.MATCH_NOT_END);
             return;
         }
-
-        match["id"] = matchId;
-        match["startedTime"] = findMatch[0]["start_time"];
-        match["endedTime"] = findMatch[0]["ended_time"];
-        match["blueUUID"] = findMatch[0]["blue_uuid"];
-        match["redUUID"] = findMatch[0]["red_uuid"];
-        match["blueScore"] = findMatch[0]["blue_score"];
-        match["redScore"] = findMatch[0]["red_score"];
-        match["mappool"] = findMatch[0]["mappool_uuid"];
-        match["aborted"] = findMatch[0]["aborted"];
 
         const blueInfo = await MySQL.query(`SELECT name FROM user WHERE uuid = '${match["blueUUID"]}';`);
         const redInfo = await MySQL.query(`SELECT name FROM user WHERE uuid = '${match["redUUID"]}';`);
 
-        match["blueName"] = blueInfo[0]["name"];
-        match["redName"] = redInfo[0]["name"];
+        const match = {
+            "id" : matchId,
+            "startedTime" : findMatch[0]["start_time"],
+            "endedTime" : findMatch[0]["ended_time"],
+            "blueUUID" : findMatch[0]["blue_uuid"],
+            "redUUID" : findMatch[0]["red_uuid"],
+            "blueName" : blueInfo[0]["name"],
+            "redName" : redInfo[0]["name"],
+            "blueScore" : findMatch[0]["blue_score"],
+            "redScore" : findMatch[0]["red_score"],
+            "mappool" : findMatch[0]["mappool_uuid"],
+            "aborted" : findMatch[0]["aborted"],
+            "rounds" : []
+        };
 
         const findRounds = await MySQL.query(`SELECT * FROM rounds WHERE match_id = '${matchId}' ORDER BY started_time ASC;`);
 
         for(let i = 0; i < findRounds.length; i++) {
-            let round = {
-                "startedTime" : "",
-                "mapid" : "",
-                "mapset" : "",
+            const findRound = findRounds[i];
+            const round = {
+                "startedTime" : findRound["started_time"],
+                "mapid" : findRound["mapid"],
+                "mapset" : findRound["mapset"],
                 "bluePlayResult" : {},
                 "redPlayResult" : {}
             };
-
-            const findRound = findRounds[i];
-            round["startedTime"] = findRound["started_time"];
-            round["mapid"] = findRound["mapid"];
-            round["mapset"] = findRound["mapset"];
 
             const mapset = findRound["mapset"];
 
@@ -177,17 +155,13 @@ router.post('/', async (req, res) => {
             match["rounds"].push(round);
         }
 
-        logger.setOutput(match);
-        const log = logger.success();
-        res.send(log);
+        RouterUtils.success(res, logger, match);
+        return;
     }
     catch (e) {
-        logger.setErrorCode(ErrorCodes.INTERNAL_SERVER_ERROR);
-        logger.setErrorStack(e);
-        const log = logger.error(true);
-        res.status(500).send(log);
+        RouterUtils.internalError(res, logger, e);
         return;
     }
 });
 
-module.exports = router;
+export default router;
