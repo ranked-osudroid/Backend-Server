@@ -1,7 +1,7 @@
-import { MySQL } from '@database';
-import { Logger } from '@logger';
-import { ErrorCodes } from '@logger/codes';
-import { RouterUtils, StringUtils } from '@utils';
+import { MySQL } from '#database';
+import Logger from '#logger';
+import { ErrorCodes } from '#codes';
+import { RouterUtils, StringUtils } from '#utils';
 
 import * as express from 'express';
 const router = express.Router();
