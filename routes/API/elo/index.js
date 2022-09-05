@@ -1,8 +1,8 @@
-const changeElo = require('./ChangeElo');
+import changeElo from './changeElo.js';
 
-const express = require('express');
+import * as express from 'express';
 const router = express.Router();
 
 router.use('/changeElo', changeElo);
 
-module.exports = router;
+export default router;

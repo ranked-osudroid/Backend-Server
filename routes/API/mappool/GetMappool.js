@@ -1,49 +1,43 @@
-const { ErrorCodes } = require('../../../logger/codes');
-const { Logger, MySQL } = require('../../../Utils');
-const express = require('express');
+import { ErrorCodes } from '#codes';
+import Logger from '#logger';
+import { MySQL } from '#database';
+import { RouterUtils } from '#utils';
+
+import * as express from 'express';
 const router = express.Router();
 
 router.post('/', async (req, res) => {
     const logger = new Logger("getMappool", req.body);
-    const { key, uuid } = req.body;
 
-    if (!key || !uuid) {
-        res.status(403).send(`Invalid Query`);
-        logger.setErrorCode(ErrorCodes.INVALID_QUERY);
-        logger.error(false);
+    if(!RouterUtils.isValidQuery(req.body, "key", "uuid")) {
+        RouterUtils.invalidQuery(res, logger);
         return;
     }
 
+    const { key, uuid } = req.body;
+
     if (key != process.env.KEY) {
-        res.status(403).send(`Invalid Key`);
-        logger.setErrorCode(ErrorCodes.INVALID_KEY);
-        logger.error(false);
+        RouterUtils.invalidKey(res, logger);
         return;
     }
 
     try {
         const checkMAppool = await MySQL.query(`SELECT uuid FROM mappool WHERE uuid = "${uuid}";`);
         if (checkMAppool.length == 0) {
-            res.status(403).send(`Mappool does not exist`);
-            logger.setErrorCode(ErrorCodes.MAPPOOL_NOT_EXIST);
-            logger.error(false);
+            RouterUtils.fail(res, logger, ErrorCodes.MAPPOOL_NOT_EXIST);
             return;
         }
         const maps = await MySQL.query(`SELECT * FROM maps WHERE inheritanceUUID = "${uuid}";`);
         let responseData = {
             "maps" : maps
         }
-        logger.setOutput(responseData);
-        const log = logger.success();
-        res.send(log);
+        RouterUtils.success(res, logger, responseData);
+        return;
     }
     catch (e) {
-        logger.setErrorCode(ErrorCodes.INTERNAL_SERVER_ERROR);
-        logger.setErrorStack(e);
-        const log = logger.error(true);
-        res.status(500).send(log);
+        RouterUtils.internalError(res, logger, e);
         return;
     }
 });
 
-module.exports = router;
+export default router;

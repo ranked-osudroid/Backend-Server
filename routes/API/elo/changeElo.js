@@ -1,32 +1,29 @@
-const { ErrorCodes } = require('../../../logger/codes');
-import {  } from '#codes';
+import { ErrorCodes } from '#codes';
 import Logger from '#logger';
-const express = require('express');
+import { RouterUtils } from '#utils';
+
+import * as express from 'express';
 const router = express.Router();
 
 router.post('/', async (req, res) => {
     const logger = new Logger("changeElo", req.body);
+
+    if(!RouterUtils.isValidQuery(req.body, "key", "draw", "uuid1", "uuid2", "elo1", "elo2")) {
+        RouterUtils.invalidQuery(res, logger);
+        return;
+    }
+
     const { key, draw, uuid1, uuid2, elo1, elo2 } = req.body;
 
-    if (!key || !draw || !uuid1 || !uuid2 || !elo1 || !elo2) {
-        res.status(403).send(`Invalid Query`);
-        logger.setErrorCode(ErrorCodes.INVALID_QUERY);
-        logger.error(false);
+    if (key != process.env.KEY) {
+        RouterUtils.invalidKey(res, logger);
         return;
     }
 
-    if (key != process.env.KEY) {
-        res.status(403).send(`Invalid Key`);
-        logger.setErrorCode(ErrorCodes.INVALID_KEY);
-        logger.error(false);
-        return;
-    }
     try {
         const checkUsers = await MySQL.query(`SELECT uuid FROM user WHERE uuid = "${uuid1}" OR uuid = "${uuid2}";`);
         if(checkUsers.length < 2) {
-            logger.setErrorCode(codes.USER_NOT_EXIST);
-            const log = logger.error(false);
-            res.send(log);
+            RouterUtils.fail(ErrorCodes.USER_NOT_EXIST);
             return;
         }
         const uuid1Elo = await MySQL.query(`SELECT * FROM elo WHERE uuid = "${uuid1}";`);
@@ -48,17 +45,13 @@ router.post('/', async (req, res) => {
             "uuid1Deviation" : `${Number(elo1) - Number(uuid1Elo[0]["elo"])}`,
             "uuid2Deviation" : `${Number(elo2) - Number(uuid2Elo[0]["elo"])}`
         }
-        logger.setOutput(responseData);
-        const log = logger.success();
-        res.send(log);
+        RouterUtils.success(res, logger, responseData);
+        return;
     }
     catch (e) {
-        logger.setErrorCode(ErrorCodes.INTERNAL_SERVER_ERROR);
-        logger.setErrorStack(e);
-        const log = logger.error(true);
-        res.status(500).send(log);
+        RouterUtils.internalError(res, logger, e);
         return;
     }
 });
 
-module.exports = router;
+export default router;

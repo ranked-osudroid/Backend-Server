@@ -1,12 +1,10 @@
-const mappoolerLogin = require('./MappoolerLogin');
-const getMappool = require('./GetMappool');
-const mappoolList = require('./MappoolList');
+import getMappool from './GetMappool.js';
+import mappoolerLogin from './MappoolerLogin.js';
 
-const express = require('express');
+import * as express from 'express';
 const router = express.Router();
 
 router.use('/mappoolerLogin', mappoolerLogin);
 router.use('/getMappool', getMappool);
-router.use('/mappoolList', mappoolList);
 
-module.exports = router;
+export default router;
