@@ -1,10 +1,12 @@
-const discord = require('./Discord');
-const verification = require('./Verification');
+import discord from './Discord.js';
+import verification from './Verification.js';
+import tokenList from './TokenList.js';
 
-const express = require('express');
+import * as express from 'express';
 const router = express.Router();
 
 router.use('/discord', discord);
 router.use('/verification', verification);
+router.use('/tokenList', tokenList);
 
-module.exports = router;
+export default router;

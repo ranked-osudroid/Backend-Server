@@ -1,7 +1,7 @@
-import createMatch from './CreateMatch';
-import endMatch from './EndMatch';
-import addRound from './AddRound';
-import getMatch from './GetMatch';
+import createMatch from './CreateMatch.js';
+import endMatch from './EndMatch.js';
+import addRound from './AddRound.js';
+import getMatch from './GetMatch.js';
 
 import * as express from 'express';
 const router = express.Router();

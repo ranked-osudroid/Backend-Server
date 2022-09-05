@@ -1,38 +1,36 @@
-// const express = require('express');
-// const router = express.Router();
-// const { Logger } = require('../../Utils');
-// // const { tokens } = require('../database/mongodb').schemas;
-
 import Logger from '#logger';
 import { RouterUtils } from '#utils';
 import { Tokens } from '#schemas';
+import { ErrorCodes } from '#codes';
+
+import * as express from 'express';
+const router = express.Router();
 
 router.get('/', async (req, res) => {
+    const logger = new Logger("TokenList", req.body);
     try {
-        const { id } = req.query;
-        if (!id) {
-            res.send(`Invalid Query.`);
+        if(!RouterUtils.isValidQuery("id")) {
+            RouterUtils.invalidQuery(res, logger);
             return;
         }
 
-        const log = await tokens.find({
+        const { id } = req.query;
+
+        const log = await Tokens.find({
             id: id
         });
 
         if(log.length == 0) {
-            res.send(`This id of tokenList does not exist or is expired.`);
+            RouterUtils.fail(res, logger, ErrorCodes.TOKEN_LIST_INVALID);
             return;
         }
 
-        res.send(JSON.stringify({
-            id: log[0]["id"],
-            tokens: log[0]["tokens"]
-        }, null, "\t"));
+        RouterUtils.success(res, logger, log);
     }
     catch (e) {
-        Logger.printStackTrace(e);
-        res.send(`An error has occurred.`);
+        RouterUtils.internalError(res, logger, e);
+        return;
     }
 });
 
-module.exports = router;
+export default router;

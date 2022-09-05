@@ -1,5 +1,5 @@
-import match from './match';
-import user from './user';
+import match from './match/index.js';
+import user from './user/index.js';
 
 import * as express from 'express';
 const router = express.Router();

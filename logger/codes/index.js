@@ -1,2 +1,2 @@
-export { default as StatusCodes } from './Status';
-export { default as ErrorCodes } from './Errors';
+export { default as StatusCodes } from './Status.js';
+export { default as ErrorCodes } from './Errors.js';

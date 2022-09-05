@@ -1,17 +1,22 @@
 import * as createError from 'http-errors';
-import * as express from 'express';
+import express from 'express';
 import * as path from 'path';
-import * as cookieParser from 'cookie-parser';
-import * as logger from 'morgan';
+import cookieParser from 'cookie-parser';
+import morgan from 'morgan';
 import * as mysql from 'mysql';
 import * as dotenv from 'dotenv';
 
-import { IpDeniedError } from 'express-ipfilter';
+import ipFilter from 'express-ipfilter';
 
 import { MySQL, MongoDB } from '#database';
 import { StringUtils } from '#utils';
 
 import mainRouter from '#routes';
+
+// https://velog.io/@suyeonpi/Node.js-dirname-is-not-defined-ES6
+import { fileURLToPath } from 'url';
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = path.dirname(__filename);
 
 /**
  * env init
@@ -25,12 +30,13 @@ MySQL.connect();
 MongoDB.connect();
 
 const app = express();
+const { IpDeniedError } = ipFilter
 
 // view engine setup
 app.set('views', path.join(__dirname, 'views'));
 app.set('view engine', 'pug');
 
-app.use(logger('dev'));
+app.use(morgan('dev'));
 app.use(express.json());
 app.use(express.urlencoded({ extended: false }));
 app.use(cookieParser());

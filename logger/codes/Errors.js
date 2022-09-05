@@ -1,4 +1,4 @@
-export default ErrorCodes = {
+const ErrorCodes = {
     INVALID_KEY : 0,
     INVALID_QUERY : 1,
     INVALID_SECURE : 2,
@@ -20,5 +20,8 @@ export default ErrorCodes = {
     MATCH_NOT_EXIST : 18,
     MATCH_ALREADY_END : 19,
     MATCH_NOT_END : 20,
-    PROFILE_NO_CHANGE: 21
+    PROFILE_NO_CHANGE: 21,
+    TOKEN_LIST_INVALID : 22
 };
+
+export default ErrorCodes;
