@@ -1,6 +1,9 @@
-const { StringUtils, MySQL, Logger } = require('../../../Utils');
-const { ErrorCodes } = require('../../../logger/codes');
-const express = require('express');
+import { MySQL } from '#database';
+import { ErrorCodes } from '#codes';
+import { StringUtils, RouterUtils } from '#utils';
+import Logger from '#logger';
+
+import * as express from 'express';
 const router = express.Router();
 
 router.post('/', async (req, res) => {

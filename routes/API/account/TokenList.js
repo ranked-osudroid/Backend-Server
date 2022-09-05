@@ -1,8 +1,8 @@
-import { MySQL } from '@database';
-import { Logger } from '@logger';
-import { ErrorCodes } from '@logger/codes';
-import { RouterUtils, StringUtils, Utils } from '@utils';
-import { Tokens } from '@database/mongodb/schemas';
+import { MySQL } from '#database';
+import Logger from '#logger';
+import { ErrorCodes } from '#codes';
+import { RouterUtils, StringUtils, Utils } from '#utils';
+import { Tokens } from '#schemas';
 
 import * as express from 'express';
 const router = express.Router();

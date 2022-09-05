@@ -1,27 +1,34 @@
-const { ErrorCodes } = require('../../../logger/codes');
-const { StringUtils, Logger, MySQL, Request } = require('../../../Utils');
-const express = require('express');
+// const { ErrorCodes } = require('../../../logger/codes');
+// const { StringUtils, Logger, MySQL, Request } = require('../../../Utils');
+// const express = require('express');
+// const router = express.Router();
+
+import { ErrorCodes } from '#codes';
+import { RouterUtils, StringUtils, Request } from '#utils';
+import Logger from '#logger';
+import { MySQL } from '#database';
+
+import * as express from 'express';
 const router = express.Router();
 
 router.post('/', async (req, res) => {
     const logger = new Logger("createPlayId", req.body);
+
+    if(!RouterUtils.isValidQuery(req.body, "key", "uuid", "mapid")) {
+        RouterUtils.invalidQuery(res, logger);
+        return;
+    }
+
     const { key, uuid, mapid } = req.body;
+
+    if (key != process.env.KEY) {
+        RouterUtils.invalidKey(res, logger);
+        return;
+    }
+
     let mapHash, mapName, mapsetid;
     let playId = StringUtils.getAlphaNumericString(7);
 
-    if (!key || !uuid || !mapid) {
-        res.status(403).send(`Invalid Query`);
-        logger.setErrorCode(ErrorCodes.INVALID_QUERY);
-        logger.error(false);
-        return;
-    }
-
-    if (key != process.env.KEY) {
-        res.status(403).send(`Invalid Key`);
-        logger.setErrorCode(ErrorCodes.INVALID_KEY);
-        logger.error(false);
-        return;
-    }
     try {
         while (true) {
             const query = await MySQL.query(`SELECT id FROM results WHERE id = "${playId}";`);
@@ -41,9 +48,7 @@ router.post('/', async (req, res) => {
             }
         }
         if (mapHash === undefined) {
-            logger.setErrorCode(ErrorCodes.MAP_NOT_EXIST);
-            const log = logger.error(false);
-            res.send(log);
+            RouterUtils.fail(res, logger, ErrorCodes.MAP_NOT_EXIST);
             return;
         }
         const sql = `INSERT INTO results(id, uuid, map_id, mapset_id, map_hash, createdTime) VALUES ("${playId}", "${uuid}", "${mapid}", "${mapsetid}", "${mapHash}", UNIX_TIMESTAMP())`;
@@ -53,17 +58,13 @@ router.post('/', async (req, res) => {
             "mapHash": mapHash,
             "mapName": mapName
         }
-        logger.setOutput(responseData);
-        const log = logger.success();
-        res.send(log);
+        RouterUtils.success(res, logger, responseData);
+        return;
     }
     catch (e) {
-        logger.setErrorCode(ErrorCodes.INTERNAL_SERVER_ERROR);
-        logger.setErrorStack(e);
-        const log = logger.error(true);
-        res.status(500).send(log);
+        RouterUtils.internalError(res, logger, e);
         return;
     }
 });
 
-module.exports = router;
+export default router;

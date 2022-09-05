@@ -1,90 +1,64 @@
-const { MySQL, Logger } = require('../../../Utils');
-const { ErrorCodes } = require('../../../logger/codes');
-const express = require('express');
+import { MySQL } from '#database';
+import { ErrorCodes } from '#codes';
+import Logger from '#logger';
+import { RouterUtils } from '#utils';
+
+import * as express from 'express';
 const router = express.Router();
 
 router.post('/', async (req, res) => {
     const logger = new Logger("recentRecord", req.body);
-    const { key, name } = req.body;
 
-    if (!key || !name) {
-        res.status(403).send(`Invalid Query`);
-        logger.setErrorCode(ErrorCodes.INVALID_QUERY);
-        logger.error(false);
+    if(!RouterUtils.isValidQuery(req.body, "key", "name")) {
+        RouterUtils.invalidQuery(res, logger);
         return;
     }
 
+    const { key, name } = req.body;
+
     if (key != process.env.KEY) {
-        res.status(403).send(`Invalid Key`);
-        logger.setErrorCode(ErrorCodes.INVALID_KEY);
-        logger.error(false);
+        RouterUtils.invalidKey(res, logger);
         return;
     }
 
     try {
         const checkExist = await MySQL.query(`SELECT uuid FROM user WHERE name = "${name}";`);
         if (checkExist.length == 0) {
-            logger.setErrorCode(ErrorCodes.USER_NOT_EXIST);
-            const log = logger.error(false);
-            res.send(log);
+            RouterUtils.fail(res, logger, ErrorCodes.USER_NOT_EXIST);
             return;
         }
         const uuid = checkExist[0]["uuid"];
         const recentRecord = await MySQL.query(`SELECT * FROM results WHERE uuid = '${uuid}' AND played = 1 ORDER BY submitTime DESC;`);
         if (recentRecord.length == 0) {
-            logger.setErrorCode(ErrorCodes.PLAYER_NO_RECORDS);
-            const log = logger.error(false);
-            res.send(log);
+            RouterUtils.fail(res, logger, ErrorCodes.PLAYER_NO_RECORDS);
             return;
         }
-        const id = recentRecord[0]["id"];
-        const mapId = recentRecord[0]["map_id"];
-        const mapSetId = recentRecord[0]["mapset_id"];
-        const mapHash = recentRecord[0]["map_hash"];
-        const _300x = recentRecord[0]["300x"];
-        const _300 = recentRecord[0]["300"];
-        const _100x = recentRecord[0]["100x"];
-        const _100 = recentRecord[0]["100"];
-        const _50 = recentRecord[0]["50"];
-        const miss = recentRecord[0]["miss"];
-        const score = recentRecord[0]["score"];
-        const acc = recentRecord[0]["acc"];
-        const rank = recentRecord[0]["rank"];
-        const modList = recentRecord[0]["mod_list"];
-        const maxCombo = recentRecord[0]["maxCombo"];
-        const submitTime = recentRecord[0]["submitTime"];
-        const createdTime = recentRecord[0]["createdTime"];
         let responseData = {
-            "id": id,
-            "mapId": mapId,
-            "mapSetId": mapSetId,
-            "mapHash": mapHash,
-            "300x": _300x,
-            "300": _300,
-            "100x": _100x,
-            "100": _100,
-            "50": _50,
-            "miss": miss,
-            "score": score,
-            "acc": acc,
-            "rank": rank,
-            "modList": modList,
-            "maxCombo" : maxCombo,
-            "submitTime": submitTime,
-            "createdTime": createdTime,
+            "id": recentRecord[0]["id"],
+            "mapId": recentRecord[0]["map_id"],
+            "mapSetId": recentRecord[0]["mapset_id"],
+            "mapHash": recentRecord[0]["map_hash"],
+            "300x": recentRecord[0]["300x"],
+            "300": recentRecord[0]["300"],
+            "100x": recentRecord[0]["100x"],
+            "100": recentRecord[0]["100"],
+            "50": recentRecord[0]["50"],
+            "miss": recentRecord[0]["miss"],
+            "score": recentRecord[0]["score"],
+            "acc": recentRecord[0]["acc"],
+            "rank": recentRecord[0]["rank"],
+            "modList": recentRecord[0]["mod_list"],
+            "maxCombo" : recentRecord[0]["maxCombo"],
+            "submitTime": recentRecord[0]["submitTime"],
+            "createdTime": recentRecord[0]["createdTime"],
         }
-        logger.setOutput(responseData);
-        const log = logger.success();
-        res.send(log);
+        RouterUtils.success(res, logger, responseData);
         return;
     }
     catch (e) {
-        logger.setErrorCode(ErrorCodes.INTERNAL_SERVER_ERROR);
-        logger.setErrorStack(e);
-        const log = logger.error(true);
-        res.status(500).send(log);
+        RouterUtils.internalError(res, logger, e);
         return;
     }
 });
 
-module.exports = router;
+export default router;

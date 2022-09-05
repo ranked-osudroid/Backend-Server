@@ -26,9 +26,9 @@ export default class MySQL {
             port: process.env.DB_PORT
         });
     
-        this.mysqlConnection.connect(function (err) {
+        this.mysqlConnection.connect((err) => {
             if (err) {
-                console.log('error when connecting to db:', err);
+                console.log('An error has occurred while connecting to db:', err);
                 setTimeout(MySQL.connect, 2000);
             }
             else {
@@ -36,9 +36,11 @@ export default class MySQL {
             }
         });
     
-        this.mysqlConnection.on('error', function (err) {
+        this.mysqlConnection.on('error', (err) => {
             console.log(`Database disconnected. Try reconnecting...`);
             MySQL.connect();
         });
     }
+
+    
 }

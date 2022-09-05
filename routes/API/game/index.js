@@ -1,9 +1,9 @@
-const submitRecord = require('./SubmitRecord');
-const recentRecord = require('./RecentRecord');
-const createPlayId = require('./CreatePlayId');
-const expirePlayId = require('./expirePlayId');
+import submitRecord from './SubmitRecord.js';
+import recentRecord from './RecentRecord.js';
+import createPlayId from './CreatePlayId.js';
+import expirePlayId from './ExpirePlayId.js';
 
-const express = require('express');
+import * as express from 'express';
 const router = express.Router();
 
 router.use('/submitRecord', submitRecord);
@@ -11,4 +11,4 @@ router.use('/recentRecord', recentRecord);
 router.use('/createPlayId', createPlayId);
 router.use('/expirePlayId', expirePlayId);
 
-module.exports = router;
+export default router;
