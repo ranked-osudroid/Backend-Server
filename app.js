@@ -3,13 +3,13 @@ import express from 'express';
 import * as path from 'path';
 import cookieParser from 'cookie-parser';
 import morgan from 'morgan';
-import * as mysql from 'mysql';
 import * as dotenv from 'dotenv';
 
 import ipFilter from 'express-ipfilter';
 
 import { MySQL, MongoDB } from '#database';
-import { StringUtils } from '#utils';
+import { Utils } from '#utils';
+import { NotFoundLogs } from '#schemas';
 
 import mainRouter from '#routes';
 
@@ -51,7 +51,13 @@ app.disable('x-powered-by');
 app.use((req, res, next) => {
 	console.log(`404 detected. IP : ${req.headers['x-forwarded-for']}`);
 	try {
-		MySQL.query(`INSERT INTO \`404Handle\`(\`id\`, \`method\`, \`ip\`, \`url\`, \`time\`) VALUES("${StringUtils.getAlphaNumericString(7)}", "${req.method}", "${req.headers['x-forwarded-for'].split(",")[0]}", "${mysql.escape(req.url)}", UNIX_TIMESTAMP());`);
+		NotFoundLogs.create({
+			ip: req.headers['x-forwarded-for'].split(",")[0],
+			method: req.method,
+			url: req.url,
+			body: req.body,
+			time: Utils.getUnixTime()
+		});
 	}
 	catch(e) {
 
