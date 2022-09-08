@@ -7,7 +7,7 @@ export default class MongoDB {
         mongoose.set('debug', true);
         mongoose.Promise = global.Promise;
     
-        mongoose.connect(`mongodb://${process.env.MONGO_DB_USER}:${process.env.MONGO_DB_PW}@${process.env.MONGO_DB_ADDRESS}/${process.env.MONGO_DB_NAME}`, {
+        mongoose.connect(`mongodb://${process.env.MONGO_DB_USER}:${process.env.MONGO_DB_PW}@${process.env.MONGO_DB_ADDRESS}:${process.env.MONGO_DB_PORT}/${process.env.MONGO_DB_NAME}`, {
             useNewUrlParser: true,
             authSource: "admin"
         }, error => {
