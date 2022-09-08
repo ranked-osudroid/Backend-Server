@@ -1,4 +1,4 @@
-import { Base64 } from 'js-base64';
+import * as Base64 from 'js-base64';
 import { v5 } from 'uuid';
 import md5 from 'md5';
 
@@ -14,11 +14,12 @@ export const getAlphaNumericString = (n) => {
 }
 
 export const getSecureString = (...strings) => {
+    const secureKeys = JSON.parse(process.env.SECURE_KEY);
     let StringBuilder = "";
     for (let i = 0; i < strings.length; i++) {
         StringBuilder += strings[i];
     }
-    const string = Base64.decode(process.env.SECURE_KEY[0]) + StringBuilder + Base64.decode(process.env.SECURE_KEY[1]);
+    const string = Base64.decode(secureKeys[0]) + StringBuilder + Base64.decode(secureKeys[1]);
     return md5(string);
 }
 

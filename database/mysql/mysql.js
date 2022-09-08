@@ -40,8 +40,21 @@ export const query = (sql, ...wildCards) => {
         });
     }
     else {
+        const queries = [];
+        while(wildCards.length != 0) {
+            let element = wildCards.shift();
+            if(typeof element === 'string' || typeof element === 'number') {
+                queries.push(element);
+            }
+            if(typeof element === 'object') {
+                for(let index of element) {
+                    queries.push(index);
+                }
+            }
+        }
+        console.log(queries);
         return new Promise((resolve, reject) => {
-            pool.query(sql, wildCards, (error, results, fields) => {
+            pool.query(sql, queries, (error, results, fields) => {
                 if(error) {
                     console.error(error);
                     reject(error);

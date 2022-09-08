@@ -1,6 +1,6 @@
 export const getDate = () => {
     const time = Math.floor(Date.now() / 1000);
-    return this.timestampToString(time);
+    return timestampToString(time);
 }
 
 export const timestampToString = (t) => {
