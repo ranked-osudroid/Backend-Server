@@ -8,7 +8,8 @@ export default class MongoDB {
         mongoose.Promise = global.Promise;
     
         mongoose.connect(`mongodb://${process.env.MONGO_DB_USER}:${process.env.MONGO_DB_PW}@${process.env.MONGO_DB_ADDRESS}/${process.env.MONGO_DB_NAME}`, {
-            useNewUrlParser: true
+            useNewUrlParser: true,
+            authSource: "admin"
         }, error => {
             if(error) {
                 console.log(`Failed to connect MongoDB!`, error);
