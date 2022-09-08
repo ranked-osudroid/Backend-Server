@@ -19,10 +19,9 @@ export const getSecureString = (...strings) => {
         StringBuilder += strings[i];
     }
     const string = Base64.decode(process.env.SECURE_KEY[0]) + StringBuilder + Base64.decode(process.env.SECURE_KEY[1]);
-    return Md5(string);
+    return md5(string);
 }
 
 export const getRandomUuid = () => {
     return v5();
-    // return uuid.uuid();
 }

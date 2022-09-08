@@ -5,8 +5,9 @@ export default class MongoDB {
         console.log(`Starting to connect MongoDB...`);
 
         mongoose.set('debug', true);
+        mongoose.Promise = global.Promise;
     
-        mongoose.connect(process.env.MONGO_URL, {
+        mongoose.connect(`mongodb://${process.env.MONGO_DB_USER}:${process.env.MONGO_DB_PW}@${process.env.MONGO_DB_ADDRESS}/${process.env.MONGO_DB_NAME}`, {
             useNewUrlParser: true
         }, error => {
             if(error) {
