@@ -22,7 +22,7 @@ router.post('/', async (req, res) => {
     }
 
     try {
-        const searchMatch = await MySQL.query(`SELECT * FROM matches WHERE match_id = '${matchId}';`);
+        const searchMatch = await MySQL.query('SELECT * FROM matches WHERE match_id = ?', matchId);
         if(searchMatch.length == 0) {
             RouterUtils.fail(res, logger, ErrorCodes.MATCH_NOT_EXIST);
             return;
@@ -40,10 +40,10 @@ router.post('/', async (req, res) => {
         };
 
         if(aborted == 1) {
-            await MySQL.query(`UPDATE matches SET aborted = 1, ended_time = ${unixTime} WHERE match_id = '${matchId}';`);
+            await MySQL.query('UPDATE matches SET aborted = 1, ended_time = ? WHERE match_id = ?', unixTime, matchId);
         }
         else {
-            await MySQL.query(`UPDATE matches SET ended_time = ${unixTime} WHERE match_id = '${matchId}';`);
+            await MySQL.query('UPDATE matches SET ended_time = ? WHERE match_id = ?', unixTime, matchId);
         }
         
         RouterUtils.success(res, logger, responseData);

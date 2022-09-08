@@ -22,12 +22,12 @@ router.post('/', async (req, res) => {
     }
 
     try {
-        const checkMAppool = await MySQL.query(`SELECT uuid FROM mappool WHERE uuid = "${uuid}";`);
-        if (checkMAppool.length == 0) {
+        const checkMappool = await MySQL.query('SELECT uuid FROM mappool WHERE uuid = ?', uuid);
+        if (checkMappool.length == 0) {
             RouterUtils.fail(res, logger, ErrorCodes.MAPPOOL_NOT_EXIST);
             return;
         }
-        const maps = await MySQL.query(`SELECT * FROM maps WHERE inheritanceUUID = "${uuid}";`);
+        const maps = await MySQL.query('SELECT * FROM maps WHERE inheritanceUUID = ?', uuid);
         let responseData = {
             "maps" : maps
         }

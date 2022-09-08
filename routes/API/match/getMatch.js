@@ -22,7 +22,7 @@ router.post('/', async (req, res) => {
     }
     
     try {
-        const findMatch = await MySQL.query(`SELECT * FROM matches WHERE match_id = '${matchId}';`);
+        const findMatch = await MySQL.query('SELECT * FROM matches WHERE match_id = ?', matchId);
 
         if(findMatch.length == 0) {
             RouterUtils.fail(res, logger, ErrorCodes.MATCH_NOT_EXIST);
@@ -34,8 +34,8 @@ router.post('/', async (req, res) => {
             return;
         }
 
-        const blueInfo = await MySQL.query(`SELECT name FROM user WHERE uuid = '${match["blueUUID"]}';`);
-        const redInfo = await MySQL.query(`SELECT name FROM user WHERE uuid = '${match["redUUID"]}';`);
+        const blueInfo = await MySQL.query('SELECT name FROM user WHERE uuid = ?', match["blueUUID"]);
+        const redInfo = await MySQL.query('SELECT name FROM user WHERE uuid = ?', match["redUUID"]);
 
         const match = {
             "id" : matchId,
@@ -52,7 +52,7 @@ router.post('/', async (req, res) => {
             "rounds" : []
         };
 
-        const findRounds = await MySQL.query(`SELECT * FROM rounds WHERE match_id = '${matchId}' ORDER BY started_time ASC;`);
+        const findRounds = await MySQL.query('SELECT * FROM rounds WHERE match_id = ? ORDER BY started_time ASC', matchId);
 
         for(let i = 0; i < findRounds.length; i++) {
             const findRound = findRounds[i];
@@ -66,8 +66,8 @@ router.post('/', async (req, res) => {
 
             const mapset = findRound["mapset"];
 
-            const bluePlayId = await MySQL.query(`SELECT \`300\`, \`100\`, \`50\`, \`miss\`, \`score\`, \`acc\`, \`rank\`, \`mod_list\`, \`maxCombo\` FROM results WHERE id = '${findRound["bluePlayID"]}';`);
-            const redPlayId = await MySQL.query(`SELECT \`300\`, \`100\`, \`50\`, \`miss\`, \`score\`, \`acc\`, \`rank\`, \`mod_list\`, \`maxCombo\` FROM results WHERE id = '${findRound["redPlayID"]}';`);
+            const bluePlayId = await MySQL.query('SELECT \`300\`, \`100\`, \`50\`, \`miss\`, \`score\`, \`acc\`, \`rank\`, \`mod_list\`, \`maxCombo\` FROM results WHERE id = ?;', findRound["bluePlayID"]);
+            const redPlayId = await MySQL.query('SELECT \`300\`, \`100\`, \`50\`, \`miss\`, \`score\`, \`acc\`, \`rank\`, \`mod_list\`, \`maxCombo\` FROM results WHERE id = ?;', findRound["redPlayID"]);
 
             if(mapset == 0) {
                 // mapset is None

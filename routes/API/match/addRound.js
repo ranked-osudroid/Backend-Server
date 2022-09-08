@@ -22,7 +22,7 @@ router.post('/', async (req, res) => {
     }
 
     try {
-        const findMatch = await MySQL.query(`SELECT * FROM matches WHERE match_id = '${matchId}';`);
+        const findMatch = await MySQL.query('SELECT * FROM matches WHERE match_id = ?', matchId);
 
         if(findMatch.length == 0) {
             RouterUtils.fail(res, logger, ErrorCodes.MATCH_NOT_EXIST);
@@ -33,7 +33,7 @@ router.post('/', async (req, res) => {
             return;
         }
 
-        const findPlayIDs = await MySQL.query(`SELECT id FROM results WHERE id = '${bluePlayID}' OR id = '${redPlayID}';`);
+        const findPlayIDs = await MySQL.query('SELECT id FROM results WHERE id = ? OR id = ?', bluePlayID, redPlayID);
 
         if(findPlayIDs.length < 2) {
             RouterUtils.fail(res, logger, ErrorCodes.PLAYID_NOT_FOUND);
@@ -42,10 +42,10 @@ router.post('/', async (req, res) => {
  
         const { blue_uuid, red_uuid, blue_score, red_score } = findMatch[0];
      
-        await MySQL.query(`INSERT INTO rounds(match_id, started_time, mapsetid, mapid, mapset, bluePlayID, redPlayID) VALUES('${matchId}', ${startedTime}, ${mapsetid}, ${mapid}, ${mapset}, '${bluePlayID}', '${redPlayID}');`);
+        await MySQL.query('INSERT INTO rounds(match_id, started_time, mapsetid, mapid, mapset, bluePlayID, redPlayID) VALUES(?, ?, ?, ?, ?, ?, ?)', matchId, startedTime, mapsetid, mapid, mapset, bluePlayID, redPlayID);
 
-        const uuid1Stats = await MySQL.query(`SELECT * FROM elo WHERE uuid = '${blue_uuid}';`);
-        const uuid2Stats = await MySQL.query(`SELECT * FROM elo WHERE uuid = '${red_uuid}';`);
+        const uuid1Stats = await MySQL.query('SELECT * FROM elo WHERE uuid = ?', blue_uuid);
+        const uuid2Stats = await MySQL.query('SELECT * FROM elo WHERE uuid = ?', red_uuid);
 
         let responseData = {
             "blueScore" : blue_score,
@@ -55,22 +55,23 @@ router.post('/', async (req, res) => {
         switch(Number(draw)) {
             case 0:
                 //draw
-                MySQL.query(`UPDATE matches SET blue_score = ${blue_score + 1}, red_score = ${red_score + 1} WHERE match_id = '${matchId}';`);
+                await MySQL.query('UPDATE matches SET blue_score = ?, red_score = ? WHERE match_id = ?', blue_score + 1, red_score + 1, matchId);
                 responseData["blueScore"]++;
                 responseData["redScore"]++;
                 break;
             case 1:
                 //blue win
-                MySQL.query(`UPDATE elo SET ${Utils.intToMod(mapset)}_win = ${uuid1Stats[0][Utils.intToMod(mapset) + "_win"] + 1} WHERE uuid = '${blue_uuid}';`);
-                MySQL.query(`UPDATE elo SET ${Utils.intToMod(mapset)}_lose = ${uuid2Stats[0][Utils.intToMod(mapset) + "_lose"] + 1} WHERE uuid = '${red_uuid}';`);
-                MySQL.query(`UPDATE matches SET blue_score = ${blue_score + 1} WHERE match_id = '${matchId}';`);
+                const mod = Utils.intToMod(mapset);
+                await MySQL.query(`UPDATE elo SET ${mod}_win = ? WHERE uuid = ?`, uuid1Stats[0][mod + "_win"] + 1, blue_uuid);
+                await MySQL.query(`UPDATE elo SET ${mod}_lose = ? WHERE uuid = ?`, uuid2Stats[0][mod + "_win"] + 1, red_uuid);
+                await MySQL.query('UPDATE matches SET blue_score = ? WHERE match_id = ?', blue_score + 1, matchId);
                 responseData["blueScore"]++;
                 break;
             case -1:
                 //red win
-                MySQL.query(`UPDATE elo SET ${Utils.intToMod(mapset)}_win = ${uuid2Stats[0][Utils.intToMod(mapset) + "_win"] + 1} WHERE uuid = '${red_uuid}}';`);
-                MySQL.query(`UPDATE elo SET ${Utils.intToMod(mapset)}_lose = ${uuid1Stats[0][Utils.intToMod(mapset) + "_lose"] + 1} WHERE uuid = '${blue_uuid}';`);
-                MySQL.query(`UPDATE matches SET red_score = ${red_score + 1} WHERE match_id = '${matchId}';`);
+                await MySQL.query(`UPDATE elo SET ${mod}_win = ? WHERE uuid = ?`, uuid2Stats[0][mod + "_win"] + 1, red_uuid);
+                await MySQL.query(`UPDATE elo SET ${mod}_lose = ? WHERE uuid = ?`, uuid1Stats[0][mod + "_win"] + 1, blue_uuid);
+                await MySQL.query('UPDATE matches SET blue_score = ? WHERE match_id = ?', red_score + 1, matchId);
                 responseData["redScore"]++;
                 break;
         }

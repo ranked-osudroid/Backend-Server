@@ -22,32 +22,35 @@ router.post('/', async (req, res) => {
     }
 
     try {
-        let sql = `UPDATE user SET `;
+        let sql = 'UPDATE user SET ';
+        let wildCards = [];
 
         if(profileId) {
-            sql += `profile = '${profileId}', `;
+            sql += 'profile = ?,';
+            wildCards.push(profileId);
         }
         if(name) {
-            sql += `name = '${name}', `;
+            sql += 'name = ?,';
+            wildCards.push(name);
         }
         if(staff) {
-            sql += `staff = ${Boolean(staff)}, `;
+            sql += 'staff = ?,';
+            wildCards.push(Boolean(staff));
         }
         if(mappooler) {
-            sql += `mappooler = ${Boolean(mappooler)}, `;
-        }
-        if(sql.endsWith(', ')) {
-            sql = sql.substring(0, sql.length - 2);
+            sql += 'mappooler = ?,';
+            wildCards.push(Boolean(mappooler));
         }
 
-        sql += ` WHERE discord_id = '${discordId}';`;
+        sql = sql.substring(0, sql.length - 1);
 
-        if(sql == `UPDATE user SET  WHERE discord_id = '${discordId}';`) {
+        if(sql == 'UPDATE user SET' || wildCards == []) {
             RouterUtils.fail(res, logger, ErrorCodes.PROFILE_NO_CHANGE);
             return;
         }
 
-        await MySQL.query(sql);
+        wildCards.push(discordId);
+        await MySQL.query(sql + ' WHERE discord_id = ?', wildCards);
 
         const responseData = {
             "message": "Successfully changed profile."

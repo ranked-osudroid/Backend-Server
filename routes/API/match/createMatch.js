@@ -30,7 +30,7 @@ router.post('/', async (req, res) => {
 
     try {
         while (true) {
-            const query = await MySQL.query(`SELECT match_id FROM matches WHERE match_id = "${matchId}";`);
+            const query = await MySQL.query('SELECT match_id FROM matches WHERE match_id = ?', matchId);
             if (query.length == 0) {
                 break;
             }
@@ -40,13 +40,12 @@ router.post('/', async (req, res) => {
         let mappool = "";
 
         if(mappoolUUID == undefined) {
-            const blueInfo = await MySQL.query(`SELECT uuid, elo FROM elo WHERE uuid = "${uuid1}";`);
-            const redInfo = await MySQL.query(`SELECT uuid, elo FROM elo WHERE uuid = "${uuid2}";`);
+            const blueInfo = await MySQL.query('SELECT uuid, elo FROM elo WHERE uuid = ?', uuid1);
+            const redInfo = await MySQL.query('SELECT uuid, elo FROM elo WHERE uuid = ?', uuid2);
             const blueElo = blueInfo[0]["elo"];
             const redElo = redInfo[0]["elo"];
-            const averageElo = (Number(blueElo) + Number(redElo)) / 2
-            let sql = `SELECT * FROM mappool WHERE averageMMR BETWEEN "${averageElo - 200}" AND "${averageElo + 200}";`;
-            const mappools = await MySQL.query(sql);
+            const averageElo = (Number(blueElo) + Number(redElo)) / 2;
+            const mappools = await MySQL.query('SELECT * FROM mappool WHERE averageMMR BETWEEN ? AND ?', averageElo - 200, averageElo + 200);
             const random = Math.floor(Math.random() * mappools.length);
             mappool = mappools[random]["uuid"];
         }
@@ -54,7 +53,7 @@ router.post('/', async (req, res) => {
             mappool = mappoolUUID;
         }
         
-        await MySQL.query(`INSERT INTO matches(match_id, start_time, ended_time, blue_uuid, red_uuid, blue_score, red_score, mappool_uuid, aborted) VALUES("${matchId}", UNIX_TIMESTAMP(), -1, "${uuid1}", "${uuid2}", 0, 0, "${mappool}", 0);`);
+        await MySQL.query('INSERT INFO matches(match_id, start_time, ended_time, blue_uuid, red_uuid, blue_score, red_score, mappool_uuid, aborted) VALUES(?, UNIX_TIMESTAMP(), -1, ?, ?, 0, 0, ?, 0)', matchId, uuid1, uuid2, mappool);
         let responseData = {
             "matchId" : matchId,
             "mappool" : mappool

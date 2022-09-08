@@ -22,11 +22,11 @@ router.post('/', async (req, res) => {
     }
 
     try {
-        const check = await MySQL.query(`SELECT discord_id FROM user WHERE discord_id = "${discord_id}";`);
+        const check = await MySQL.query('SELECT discord_id FROM user WHERE discord_id = ?', discord_id);
         if (check.length == 0) {
             let uuid = StringUtils.getRandomUuid();
-            while (-1) {
-                const uuidCheck = await MySQL.query(`SELECT uuid FROM user WHERE uuid = "${uuid}";`);
+            while (true) {
+                const uuidCheck = await MySQL.query('SELECT uuid FROM user WHERE uuid = ?', uuid);
                 if (uuidCheck.length == 0) {
                     break;
                 }
@@ -36,8 +36,8 @@ router.post('/', async (req, res) => {
                 }
             }
             const elo = Utils.getInitialElo(rank);
-            await MySQL.query(`INSERT INTO \`user\`(\`discord_id\`, \`o_uid\`, \`uuid\`, \`name\`, \`verified_time\`, \`mappooler\`, \`profile\`, \`staff\`) VALUES ("${discord_id}", "${uid}", "${uuid}", "${name}", UNIX_TIMESTAMP(), 0, '${profile}', 0);`);
-            await MySQL.query(`INSERT INTO elo(uuid, elo, win, draw, lose) VALUES("${uuid}", ${elo}, 0, 0, 0);`);
+            await MySQL.query('INSERT INTO `user`(discord_id, o_uid, uuid, name, verified_time, mappooler, profile, staff) VALUES(?, ?, ?, ?, UNIX_TIMESTAMP(), 0, ?, 0)', discord_id, uid, uuid, name, profile);
+            await MySQL.query('INSERT INRO elo(uuid, elo, win, draw, lose) VALUES(?, ?, 0, 0, 0)', uuid, elo);
             let responseData = {
                 "message": "Successfully registered the user."
             }

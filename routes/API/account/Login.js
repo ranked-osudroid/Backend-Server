@@ -24,13 +24,13 @@ router.post('/', async (req, res) => {
     }
 
     try {
-        const checkToken = await MySQL.query(`SELECT uuid, deviceID, vaild, \`lock\` FROM token WHERE md5 = "${StringUtils.getSecureString(token)}";`);
+        const checkToken = await MySQL.query('SELECT uuid, deviceID, vaild, `lock` FROM token WHERE md5 = ?', StringUtils.getSecureString(token));
         if (checkToken.length == 0) {
             RouterUtils.fail(res, logger, ErrorCodes.TOKEN_NOT_EXIST);
             return;
         }
         if (checkToken.length >= 2) {
-            await MySQL.query(`UPDATE token SET vaild = 0, \`lock\` = 1, expiredTime = UNIX_TIMESTAMP() WHERE deviceID = "${deviceid}";`);
+            await MySQL.query('UPDATE token SET vaild = 0, `lock` = 1, expiredTime = UNIX_TIMESTAMP() WHERE deviceID = ?', deviceid);
             RouterUtils.fail(res, logger, ErrorCodes.ILLEGAL_LOGIN);
             return;
         }
@@ -44,15 +44,15 @@ router.post('/', async (req, res) => {
         }
         if (checkToken[0]["deviceID"] != deviceid) {
             if (checkToken[0]["deviceID"] == null) {
-                await MySQL.query(`UPDATE token SET deviceID = "${deviceid}" WHERE md5 = "${StringUtils.getSecureString(token)}";`);
+                await MySQL.query('UPDATE token SET deviceID = ? WHERE md5 = ?', deviceid, StringUtils.getSecureString(token));
             }
             else {
-                await MySQL.query(`UPDATE token SET vaild = 0, \`lock\` = 1, expiredTime = UNIX_TIMESTAMP() WHERE md5 = "${StringUtils.getSecureString(token)}";`);
+                await MySQL.query('UPDATE token SET vaild = 0; `lock` = 1, expiredTime = UNIX_TIMESTAMP() WHERE md5 = ?', StringUtils.getSecureString(token));
                 RouterUtils.fail(res, logger, ErrorCodes.ILLEGAL_LOGIN);
                 return;
             }
         }
-        const userInfo = await MySQL.query(`SELECT name, discord_id, profile, mappooler, staff FROM user WHERE uuid = "${checkToken[0]["uuid"]}";`);
+        const userInfo = await MySQL.query('SELECT name, discord_id, profile, mappooler, staff FROM user WHERE uuid = ?', checkToken[0]["uuid"]);
         let responseData = {
             "uuid": checkToken[0]["uuid"],
             "name": userInfo[0]["name"],

@@ -25,18 +25,7 @@ router.post('/', async (req, res) => {
     }
 
     try {
-        let query = ``;
-        if(uuid != undefined) {
-            query = `uuid = '${uuid}';`;
-        }
-        if(discordid != undefined) {
-            query = `discord_id = '${discordid}';`;
-        }
-        if(username != undefined) {
-            query = `name = '${username}';`;
-        }
-
-        const search = await MySQL.query(`SELECT * FROM user WHERE ${query}`);
+        const search = await MySQL.query(`SELECT * FROM user WHERE uuid = ? OR discord_id = ? OR name = ?`, uuid, discordid, username);
 
         if (search.length == 0) {
             RouterUtils.fail(res, logger, ErrorCodes.USER_NOT_EXIST);
@@ -46,10 +35,10 @@ router.post('/', async (req, res) => {
         const discordId = search[0]["discord_id"];
         const { o_uid, name, verified_time, banned, mappooler, profile, staff } = search[0];
 
-        const eloSearch = await MySQL.query(`SELECT * FROM elo WHERE uuid = "${UUID}";`);
+        const eloSearch = await MySQL.query('SELECT * FROM elo WHERE uuid = ?', UUID);
         const { elo, win, draw, lose } = eloSearch[0];
 
-        const tokenSearch = await MySQL.query(`SELECT COUNT(uuid) as 'count' FROM token WHERE uuid = '${UUID}' AND vaild = 1`);
+        const tokenSearch = await MySQL.query('SELECT COUNT(uuid) as \'count\' FROM token WHERE uuid = ? AND vaild = 1', UUID);
 
         let responseData = {
             "uuid": UUID,

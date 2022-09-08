@@ -28,14 +28,14 @@ router.post('/', async (req, res) => {
     }
 
     try {
-        const result = await MySQL.query(`SELECT id, played FROM results WHERE uuid = "${uuid}" AND played = 0 AND map_hash = "${mapHash}";`);
+        const result = await MySQL.query('SELECT id, played FROM results WHERE uuid = ? and played = 0 and map_hash = ?', uuid, mapHash);
         if (result.length != 0) {
             const played = result[0]["played"];
             if (played == 1) {
                 RouterUtils.fail(res, logger, ErrorCodes.EXPIRED_PLAYID);
                 return;
             }
-            await MySQL.query(`UPDATE results SET \`300x\` = ${_300x}, \`300\` = ${_300}, \`100x\` = ${_100x}, \`100\` = ${_100}, \`50\` = ${_50}, \`miss\` = ${miss}, \`score\` = ${score}, \`acc\` = "${acc}", \`submitTime\` = ${time}, \`mod_list\` = "${modList}", \`rank\` = "${rank}", maxCombo = ${maxCombo}, \`played\` = 1 WHERE id = "${result[0]["id"]}";`);
+            await MySQL.query('UPDATE results SET `300x` = ?, `300` = ?, `100x` = ?, `100` = ?, `50` = ?, miss = ?, score = ?, acc = ?, submitTime = ?, mod_list = ?, `rank` = ?, maxCombo = ?, played = 1 WHERE id = ?', _300x, _300, _100x, _100, _50, miss, score, acc, time, modList, rank, maxCombo, result[0]["id"]);
             let responseData = {
                 "message": "Successfully submitted the score."
             }

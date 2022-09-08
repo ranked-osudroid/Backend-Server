@@ -22,13 +22,13 @@ router.post('/', async (req, res) => {
     }
 
     try {
-        const checkExist = await MySQL.query(`SELECT uuid FROM user WHERE name = "${name}";`);
+        const checkExist = await MySQL.query('SELECT uuid FROM user WHERE name = ?', name);
         if (checkExist.length == 0) {
             RouterUtils.fail(res, logger, ErrorCodes.USER_NOT_EXIST);
             return;
         }
         const uuid = checkExist[0]["uuid"];
-        const recentRecord = await MySQL.query(`SELECT * FROM results WHERE uuid = '${uuid}' AND played = 1 ORDER BY submitTime DESC;`);
+        const recentRecord = await MySQL.query('SELECT * FROM results WHERE uuid = ? AND played = 1 ORDER BY submitTime DESC', uuid);
         if (recentRecord.length == 0) {
             RouterUtils.fail(res, logger, ErrorCodes.PLAYER_NO_RECORDS);
             return;

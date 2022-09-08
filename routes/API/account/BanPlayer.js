@@ -23,7 +23,7 @@ router.post('/', async (req, res) => {
     }
 
     try {
-        const searchPlayer = await MySQL.query(`SELECT banned FROM user WHERE uuid = '${uuid}';`);
+        const searchPlayer = await MySQL.query('SELECT banned FROM user WHERE uuid = ?', uuid);
         if(searchPlayer.length == 0) {
             RouterUtils.fail(res, logger, ErrorCodes.USER_NOT_EXIST);
             return;
@@ -33,9 +33,9 @@ router.post('/', async (req, res) => {
             RouterUtils.fail(res, logger, ErrorCodes.ALREADY_BANNED);
             return;
         }
-        
-        await MySQL.query(`UPDATE user SET banned = 1 WHERE uuid = '${uuid}';`);
-        await MySQL.query(`UPDATE token SET vaild = 0, \`lock\` = 1, expiredTime = UNIX_TIMESTAMP() WHERE uuid = '${uuid}';`);
+
+        await MySQL.query('UPDATE user SET banned = 1 WHERE uuid = ?', uuid);
+        await MySQL.query('UPDATE token SET vaild = 0, `lock` = 1, expiredTime = UNIX_TIMESTAMP() WHERE uuid = ?', uuid);
 
         const responseData = {
             "message" : "Successfully banned"

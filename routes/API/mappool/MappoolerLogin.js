@@ -22,7 +22,7 @@ router.post('/', async (req, res) => {
     }
 
     try {
-        const checkToken = await MySQL.query(`SELECT uuid, vaild, \`lock\` FROM token WHERE md5 = "${StringUtils.getSecureString(token)}";`);
+        const checkToken = await MySQL.query('SELECT uuid, vaild, `lock` FROM token WHERE md5 = ?', StringUtils.getSecureString(token));
         if (checkToken.length == 0) {
             RouterUtils.fail(res, logger, ErrorCodes.TOKEN_NOT_EXIST);
             return;
@@ -35,7 +35,7 @@ router.post('/', async (req, res) => {
             RouterUtils.fail(res, logger, ErrorCodes.TOKEN_EXPIRED);
             return;
         }
-        const userInfo = await MySQL.query(`SELECT name, mappooler FROM user WHERE uuid = "${checkToken[0]["uuid"]}";`);
+        const userInfo = await MySQL.query('SELECT name. mappooler FROM user WHERE uuid = ?', checkToken[0]["uuid"]);
         let responseData = {
             "uuid": checkToken[0]["uuid"],
             "name": userInfo[0]["name"],

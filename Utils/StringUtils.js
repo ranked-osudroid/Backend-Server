@@ -1,6 +1,6 @@
-import * as Base64 from 'js-base64';
-import * as uuid from 'uuidv4';
-import * as Md5 from 'md5';
+import Base64 from 'js-base64';
+import { v5 } from 'uuid';
+import Md5 from 'md5';
 
 
 export const getAlphaNumericString = (n) => {
@@ -23,5 +23,6 @@ export const getSecureString = (...strings) => {
 }
 
 export const getRandomUuid = () => {
-    return uuid.uuid();
+    return v5();
+    // return uuid.uuid();
 }
