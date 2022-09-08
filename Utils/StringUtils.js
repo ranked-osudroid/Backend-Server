@@ -1,6 +1,6 @@
-import Base64 from 'js-base64';
+import { Base64 } from 'js-base64';
 import { v5 } from 'uuid';
-import Md5 from 'md5';
+import md5 from 'md5';
 
 
 export const getAlphaNumericString = (n) => {
