@@ -3,14 +3,19 @@ import { StatusCodes } from '#codes';
 
 export default class Logger {
 
+    /**
+     * Logger 인스턴스를 생성합니다.
+     * @param {String} type API 의 타입을 입력 받습니다.
+     * @param {Object} input Request의 body 를 입력 받습니다.
+     */
     constructor(type, input) {
         this.type = type;
         this.input = input;
-        if(!(type instanceof String)) {
-            throw new Error("IllegalTypeError : The type of 'type' should be String!");
+        if(typeof type !== 'string') {
+            throw new Error("IllegalTypeError : The type of 'type' should be string!");
         }
-        if(!(input instanceof Object)) {
-            throw new Error("IllegalTypeError : The type of 'input' should be Object!");
+        if(typeof input !== 'object') {
+            throw new Error("IllegalTypeError : The type of 'input' should be object!");
         }
         this.output = null;
         this.time = Utils.getDate();
