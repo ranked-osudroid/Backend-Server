@@ -49,7 +49,7 @@ export default class Logger {
      * @param {Boolean} save DB에 로그 저장 여부를 결정합니다. true 일 경우 DB에 로그를 저장하고, false 일 경우 저장하지 않습니다.
      * @returns {Object} 요청 시간, request 종류, 에러 코드, request body, 요청 결과 코드를 저장한 Object를 반환합니다.
      */
-    error = (save) => {
+    error = async (save) => {
         const log = {
             status: StatusCodes.FAILED,
             time: this.time,
@@ -60,10 +60,11 @@ export default class Logger {
         if(save) {
 
             // MongoDB에 동기 로그 저장
-            const dbLog = Errors.create(log);
-            console.log(dbLog);
+            log["stack"] = this.errorStack;
+            const document = await Errors.create(log);
+            delete log["stack"];
 
-            console.log(`Error! | Type : ${this.type} | LogFile : ${this.fileName}`);
+            console.log(`Error! | Type : ${this.type} | Log ID : ${document["_id"].toString()}`);
             console.log(this.errorStack);
         }
         else {

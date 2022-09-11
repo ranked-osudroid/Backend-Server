@@ -17,6 +17,9 @@ const schema = new Schema({
     body: {
         type: Object,
         required: true
+    },
+    stack: {
+        type: String
     }
 });
 

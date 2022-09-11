@@ -51,8 +51,11 @@ export const query = (sql, ...wildCards) => {
                     queries.push(index);
                 }
             }
+            if(typeof element === 'undefined') {
+                queries.push(null);
+            }
         }
-        console.log(queries);
+        // console.log(queries);
         return new Promise((resolve, reject) => {
             pool.query(sql, queries, (error, results, fields) => {
                 if(error) {

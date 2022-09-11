@@ -55,10 +55,10 @@ export const invalidSecure = (res, logger) => {
  * @param {Logger} logger Logger의 인스턴스를 입력 받습니다.
  * @param {Object} e catch(e)에 담긴 Object를 입력 받습니다. 
  */
-export const internalError = (res, logger, e) => {
+export const internalError = async (res, logger, e) => {
     logger.setErrorCode(ErrorCodes.INTERNAL_SERVER_ERROR);
     logger.setErrorStack(e);
-    const log = logger.error(true);
+    const log = await logger.error(true);
     res.status(500).send(log);
 };
 

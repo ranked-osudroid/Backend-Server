@@ -18,9 +18,6 @@ router.post('/', async (req, res) => {
 
     const secureString = StringUtils.getSecureString(token, deviceid, process.env.VERSION_NAME);
 
-    console.log(`Expected secureString : ${secureString}`);
-    console.log(`Received secureString : ${secure}`);
-
     if (secure != secureString) {
         RouterUtils.invalidSecure(res, logger);
         return;
