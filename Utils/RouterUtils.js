@@ -13,7 +13,7 @@ export const isValidQuery = (body, ...queryNames) => {
         }
     }
     return true;
-};
+}
 
 /**
  * Request 요청이 알맞은 쿼리가 아닐 경우, 요청을 거부하는 함수 입니다.
@@ -24,7 +24,7 @@ export const invalidQuery = (res, logger) => {
     res.status(422).send(`Invalid Query`);
     logger.setErrorCode(ErrorCodes.INVALID_QUERY);
     logger.error(false);
-};
+}
 
 /**
  * Request 요청에 있는 API Key가 알맞지 않을 경우, 요청을 거부하는 함수 입니다.
@@ -35,7 +35,7 @@ export const invalidKey = (res, logger) => {
     res.status(401).send(`Invalid Key`);
     logger.setErrorCode(ErrorCodes.INVALID_KEY);
     logger.error(false);
-};
+}
 
 /**
  * Request 요청에 있는 암호 검사 문자열이 올바르지 않은 경우, 요청을 거부하는 함수 입니다.
@@ -60,7 +60,7 @@ export const internalError = async (res, logger, e) => {
     logger.setErrorStack(e);
     const log = await logger.error(true);
     res.status(500).send(log);
-};
+}
 
 /**
  * 요청 처리중 예외 상황이 발생한 경우, 에러코드와 함께 요청을 거부 합니다.
@@ -84,5 +84,5 @@ export const success = (res, logger, data) => {
     logger.setOutput(data);
     const log = logger.success();
     res.send(log);
-};
+}
 
