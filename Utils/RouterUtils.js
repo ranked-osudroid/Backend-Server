@@ -68,9 +68,9 @@ export const internalError = async (res, logger, e) => {
  * @param {Logger} logger Logger의 인스턴스를 입력 받습니다.
  * @param {ErrorCodes} code 해당 예외에 해당하는 에러 코드를 입력 받습니다. 
  */
-export const fail = (res, logger, code) => {
+export const fail = async (res, logger, code) => {
     logger.setErrorCode(code);
-    const log = logger.error(false);
+    const log = await logger.error(false);
     res.send(log);
 }
 
