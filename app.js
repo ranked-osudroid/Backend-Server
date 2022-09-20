@@ -4,12 +4,15 @@ import * as path from 'path';
 import cookieParser from 'cookie-parser';
 import morgan from 'morgan';
 import * as dotenv from 'dotenv';
+import { createServer } from 'http';
+import { Server } from 'socket.io';
 
 import ipFilter from 'express-ipfilter';
 
 import { MySQL, MongoDB } from '#database';
 import { Utils } from '#utils';
 import { NotFoundLogs } from '#schemas';
+import SocketHandler from '#socket';
 
 import mainRouter from '#routes';
 
@@ -18,19 +21,22 @@ import { fileURLToPath } from 'url';
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 
-/**
+/*
  * env init
  */
 dotenv.config();
 
-/**
+/*
  * Connect to DB
- * */
+ */
 MySQL.connect();
 MongoDB.connect();
 
 const app = express();
+const httpServer = createServer(app);
+const socketServer = new Server(httpServer);
 const { IpDeniedError } = ipFilter
+
 
 // view engine setup
 app.set('views', path.join(__dirname, 'views'));
@@ -82,6 +88,9 @@ app.use((err, req, res, next) => {
 	}
 });
 
-app.listen(process.env.WEB_PORT, (req, res) => {
+httpServer.listen(process.env.WEB_PORT, async (req, res) => {
 	console.log(`Web server is now listening on port ${process.env.WEB_PORT}!`);
+	SocketHandler();
 });
+
+export { socketServer, httpServer }

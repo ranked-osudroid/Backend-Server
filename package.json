@@ -7,7 +7,9 @@
         "#utils": "./utils/index.js",
         "#routes": "./routes/index.js",
         "#codes": "./logger/codes/index.js",
-        "#schemas": "./database/mongodb/schemas/index.js"
+        "#schemas": "./database/mongodb/schemas/index.js",
+        "#server": "./app.js",
+        "#socket": "./socket/index.js"
     },
     "scripts": {
         "start": "node app.js"
@@ -28,6 +30,7 @@
         "morgan": "~1.9.1",
         "mysql2": "^2.3.3",
         "pug": "^2.0.4",
+        "socket.io": "^4.5.2",
         "uuid": "^8.3.2"
     },
     "type": "module"
