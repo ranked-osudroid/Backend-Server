@@ -35,7 +35,7 @@ MongoDB.connect();
 const app = express();
 const httpServer = createServer(app);
 const socketServer = new Server(httpServer);
-const { IpDeniedError } = ipFilter
+const { IpDeniedError } = ipFilter;
 
 
 // view engine setup
