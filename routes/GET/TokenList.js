@@ -9,7 +9,7 @@ const router = express.Router();
 router.get('/', async (req, res) => {
     const logger = new Logger("TokenList", req.body);
     try {
-        if(!RouterUtils.isValidQuery("id")) {
+        if(!RouterUtils.isValidQuery(req.body, "id")) {
             RouterUtils.invalidQuery(res, logger);
             return;
         }
