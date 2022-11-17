@@ -40,7 +40,7 @@ export default function init() {
             if(mapSession == undefined) {
                 return;
             }
-            console.log(`Client(${socket.id}) Cursor Press Event on Beatmap(${mapId}) | time : ${time} | i : ${i} | x : ${x} | y : ${y}`);
+            // console.log(`Client(${socket.id}) Cursor Press Event on Beatmap(${mapId}) | time : ${time} | i : ${i} | x : ${x} | y : ${y}`);
             mapSession.addPosition(new Position("press", time, i, x, y));
         });
 
@@ -49,7 +49,7 @@ export default function init() {
             if(mapSession == undefined) {
                 return;
             }
-            console.log(`Client(${socket.id}) Cursor Move Event on Beatmap(${mapId}) | time : ${time} | i : ${i} | x : ${x} | y : ${y}`);
+            // console.log(`Client(${socket.id}) Cursor Move Event on Beatmap(${mapId}) | time : ${time} | i : ${i} | x : ${x} | y : ${y}`);
             mapSession.addPosition(new Position("move", time, i, x, y));
         });
 
@@ -58,7 +58,7 @@ export default function init() {
             if(mapSession == undefined) {
                 return;
             }
-            console.log(`Client(${socket.id}) Cursor Release Event on Beatmap(${mapId}) | time : ${time} | i : ${i}`);
+            // console.log(`Client(${socket.id}) Cursor Release Event on Beatmap(${mapId}) | time : ${time} | i : ${i}`);
             mapSession.addPosition(new Position("release", time, i));
         });
 
