@@ -27,7 +27,7 @@ router.post('/', async (req, res) => {
             RouterUtils.fail(res, logger, ErrorCodes.USER_NOT_EXIST);
             return;
         }
-        const validId = await MySQL.query('SELECT md5 FROM token WHERE uuid = ? AND vaild = 1');
+        const validId = await MySQL.query('SELECT md5 FROM token WHERE uuid = ? AND vaild = 1', uuid);
         for (let i = 0; i < validId.length; i++) {
             await MySQL.query('UPDATE token SET vaild = 0, expiredTime = UNIX_TIMESTAMP() WHERE md5 = ?', validId[i]["md5"]);
         }

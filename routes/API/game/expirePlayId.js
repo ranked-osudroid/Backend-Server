@@ -29,7 +29,7 @@ router.post('/', async (req, res) => {
             return;
         }
 
-        await MySQL.query('UPDATE results SET `300x` = 0, `300` = 0, `100x` = 0, `100` = 0, `50` = 0, miss = 0, score = 0, acc = 0, rank = \'D\', mod_list = \'None\', maxCombo = 0, submitTime = UNIX_TIMESTAMP(), played = 1 WHERE id = ?', playId);
+        await MySQL.query('UPDATE results SET `300x` = 0, `300` = 0, `100x` = 0, `100` = 0, `50` = 0, miss = 0, score = 0, acc = 0, `rank` = \'D\', mod_list = \'None\', maxCombo = 0, submitTime = UNIX_TIMESTAMP(), played = 1 WHERE id = ?', playId);
 
         let responseData = {
             "playId": playId
