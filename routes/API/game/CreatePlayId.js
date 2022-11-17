@@ -2,6 +2,7 @@ import { ErrorCodes } from '#codes';
 import { RouterUtils, StringUtils, Request } from '#utils';
 import Logger from '#logger';
 import { MySQL } from '#database';
+import { Records } from '#schemas';
 
 import * as express from 'express';
 const router = express.Router();
@@ -21,19 +22,30 @@ router.post('/', async (req, res) => {
         return;
     }
 
-    let mapHash, mapName, mapsetid;
-    let playId = StringUtils.getAlphaNumericString(7);
-
     try {
+        let mapHash, mapName, mapsetid;
+
+        let playId = StringUtils.getAlphaNumericString(7);
+
         while (true) {
-            const query = await MySQL.query('SELECT id FROM results WHERE id = ?', playId);
-            if (query.length == 0) {
+            // const query = await MySQL.query('SELECT id FROM results WHERE id = ?', playId);
+            // if (query.length == 0) {
+            //     break;
+            // }
+            // playId = StringUtils.getAlphaNumericString(7);
+            const query = await Records.findOne({
+                id : playId
+            });
+            console.log(`${playId} : ${query}`);
+            if(query == null) {
                 break;
             }
             playId = StringUtils.getAlphaNumericString(7);
         }
+
         const osuRequest = new Request(`https://osu.ppy.sh/api/get_beatmaps?k=${process.env.OSU_KEY}&b=${mapid}`);
         const osuapi = await osuRequest.sendRequest();
+
         for (let i = 0; i < osuapi.length; i++) {
             if (osuapi[i]["beatmap_id"] == mapid) {
                 mapHash = osuapi[i]["file_md5"];
@@ -42,16 +54,28 @@ router.post('/', async (req, res) => {
                 break;
             }
         }
+
         if (mapHash === undefined) {
             RouterUtils.fail(res, logger, ErrorCodes.MAP_NOT_EXIST);
             return;
         }
-        await MySQL.query('INSERT INTO results(id, uuid, map_id, mapset_id, map_hash, createdTime) VALUES(?, ?, ?, ?, ?, UNIX_TIMESTAMP())', playId, uuid, mapid, mapsetid, mapHash);
+
+        Records.create({
+            id: playId,
+            uuid: uuid,
+            mapId: mapid,
+            mapSetId: mapsetid,
+            mapHash: mapHash
+        });
+
+        // await MySQL.query('INSERT INTO results(id, uuid, map_id, mapset_id, map_hash, createdTime) VALUES(?, ?, ?, ?, ?, UNIX_TIMESTAMP())', playId, uuid, mapid, mapsetid, mapHash);
+        
         let responseData = {
             "playId": playId,
             "mapHash": mapHash,
             "mapName": mapName
         }
+
         RouterUtils.success(res, logger, responseData);
         return;
     }
