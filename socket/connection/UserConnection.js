@@ -9,7 +9,7 @@ export default class UserConnection {
     rawSocket;
 
     /** @type {string} */
-    socketId;
+    ownedMapSessionId;
 
     /**
      * @param {string} userName 
@@ -18,7 +18,7 @@ export default class UserConnection {
     constructor(userName, rawSocket) {
         this.userName = userName;
         this.rawSocket = rawSocket;
-        this.socketId = rawSocket.id
+        this.ownedMapSession = null;
     }
 
     /**
@@ -36,10 +36,21 @@ export default class UserConnection {
     }
 
     /**
-     * @returns {string} 
+     * @returns {string}
      */
-    getSocketId() {
-        return this.socketId;
+    getOwnedMapSessionId() {
+        return this.ownedMapSessionId;
+    }
+
+    /**
+     * @param {string} ownedMapSessionId
+     */
+    setOwnedMapSessionId(ownedMapSessionId) {
+        this.ownedMapSessionId = ownedMapSessionId;
+    }
+
+    toString() {
+        return `UserConnection{userName = ${this.userName}, socket = ${this.rawSocket.id}, ownedMapSessionId = ${this.ownedMapSessionId}}`;
     }
 
 }

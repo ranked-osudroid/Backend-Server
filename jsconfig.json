@@ -6,7 +6,9 @@
             "#codes" : ["./logger/codes/index.js"],
             "#schemas" : ["./database/mongodb/schemas/index.js"],
             "#server": ["./app.js"],
-            "#socket": ["./socket/index.js"]
+            "#socket": ["./socket/index.js"],
+            "#socketBeatmap": ["./socket/beatmap/index.js"],
+            "#socketConnection": ["./socket/connection/index.js"]
         }
     },
     "exclude": [
