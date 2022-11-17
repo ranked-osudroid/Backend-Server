@@ -53,7 +53,7 @@ router.post('/', async (req, res) => {
             mappool = mappoolUUID;
         }
         
-        await MySQL.query('INSERT INFO matches(match_id, start_time, ended_time, blue_uuid, red_uuid, blue_score, red_score, mappool_uuid, aborted) VALUES(?, UNIX_TIMESTAMP(), -1, ?, ?, 0, 0, ?, 0)', matchId, uuid1, uuid2, mappool);
+        await MySQL.query('INSERT INTO matches(match_id, start_time, ended_time, blue_uuid, red_uuid, blue_score, red_score, mappool_uuid, aborted) VALUES(?, UNIX_TIMESTAMP(), -1, ?, ?, 0, 0, ?, 0)', matchId, uuid1, uuid2, mappool);
         let responseData = {
             "matchId" : matchId,
             "mappool" : mappool
