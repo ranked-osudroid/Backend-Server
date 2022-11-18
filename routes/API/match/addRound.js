@@ -2,6 +2,7 @@ import { MySQL } from '#database';
 import Logger from '#logger';
 import { ErrorCodes } from '#codes';
 import { RouterUtils, Utils } from '#utils';
+import { Records } from '#schemas';
 
 import * as express from 'express';
 const router = express.Router();
@@ -33,7 +34,10 @@ router.post('/', async (req, res) => {
             return;
         }
 
-        const findPlayIDs = await MySQL.query('SELECT id FROM results WHERE id = ? OR id = ?', bluePlayID, redPlayID);
+        // TODO : 자고 일어나면 Mongoose or 연산법이랑 findOne 같이 Document 하나만 불러오는거 말고 여러개 불러오는 방법 찾기
+        // const findPlayIDs = await MySQL.query('SELECT id FROM results WHERE id = ? OR id = ?', bluePlayID, redPlayID);
+
+        const findPlayIDs = await Records.find({$or : [{id : bluePlayID}, {id: redPlayID}]}).exec();
 
         if(findPlayIDs.length < 2) {
             RouterUtils.fail(res, logger, ErrorCodes.PLAYID_NOT_FOUND);
