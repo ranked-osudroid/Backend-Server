@@ -26,14 +26,32 @@ export default function init() {
             const connection = connectionMap.get(socket.id);
             if(connection === undefined) {
                 console.log(`DisConnect from ${connection.toString()}`);
+                return;
             }
             console.log(`Client(${socket.id}) disconnected!`);
+            connectionMap.delete(socket.id);
+
+            /*
+             * 플레이어 하나가 나갔다는 것을 모든 소켓에게 알림
+             */
+            connectionMap.forEach((value, key) => {
+                value.getRawSocket().emit('leave_connection', username);
+            });
+
         });
 
-        socket.on('session_sync', (username) => {
+        socket.on('session_sync', async (username) => {
             let userConnection = new UserConnection(username, socket);
             connectionMap.set(socket.id, userConnection);
             console.log(`Client(${socket.id}) is binded as ${username} !`);
+
+            /*
+             * 새로운 플레이어가 들어왔다는 것을 모든 소켓에게 알림
+             */
+            connectionMap.forEach((value, key) => {
+                value.getRawSocket().emit("join_connection", username);
+            });
+            
         });
 
         socket.on('message', (message) => {
