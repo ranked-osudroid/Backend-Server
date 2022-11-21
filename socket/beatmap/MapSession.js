@@ -3,6 +3,21 @@ import { Socket } from "socket.io";
 
 export default class MapSession {
 
+    /** 
+     * Key : mapSessionID
+     * Value : MapSession class
+     * @type {Map<string, MapSession>} 
+     */
+    static mapSessions = new Map();
+
+    /**
+     * 모든 플레이 세션 목록들을 담은 Map 인스턴스를 반환 하는 Getter 메소드 입니다.
+     * @returns {Map<string, MapSession>}
+     */
+    static getMapSessions() {
+        return this.mapSessions;
+    }
+
     /** @type {UserConnection} */
     owner;
 
