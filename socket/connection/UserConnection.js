@@ -49,6 +49,9 @@ export default class UserConnection {
         this.ownedMapSessionId = ownedMapSessionId;
     }
 
+    /**
+     * @returns {string}
+     */
     toString() {
         return `UserConnection{userName = ${this.userName}, socket = ${this.rawSocket.id}, ownedMapSessionId = ${this.ownedMapSessionId}}`;
     }
