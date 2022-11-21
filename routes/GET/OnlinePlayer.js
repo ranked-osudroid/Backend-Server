@@ -13,7 +13,7 @@ router.get('/', async(req, res) => {
             users: UserConnection.getConnections().size
         };
 
-        RouterUtils.success(response, logger, log);
+        RouterUtils.success(res, logger, response);
     }
     catch(e) {
         RouterUtils.internalError(res, logger, e);
