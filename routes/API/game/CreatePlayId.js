@@ -1,11 +1,13 @@
 import { ErrorCodes } from '#codes';
 import { RouterUtils, StringUtils, Request } from '#utils';
 import Logger from '#logger';
-import { MySQL } from '#database';
 import { Records } from '#schemas';
 
 import * as express from 'express';
 const router = express.Router();
+
+/** @type Map<number, { mapHash : string, mapName : string, mapSetId : number }> */
+const mapCache = new Map();
 
 router.post('/', async (req, res) => {
     const logger = new Logger("createPlayId", req.body);
@@ -28,11 +30,6 @@ router.post('/', async (req, res) => {
         let playId = StringUtils.getAlphaNumericString(7);
 
         while (true) {
-            // const query = await MySQL.query('SELECT id FROM results WHERE id = ?', playId);
-            // if (query.length == 0) {
-            //     break;
-            // }
-            // playId = StringUtils.getAlphaNumericString(7);
             const query = await Records.findOne({
                 id : playId
             });
@@ -43,21 +40,36 @@ router.post('/', async (req, res) => {
             playId = StringUtils.getAlphaNumericString(7);
         }
 
-        const osuRequest = new Request(`https://osu.ppy.sh/api/get_beatmaps?k=${process.env.OSU_KEY}&b=${mapid}`);
-        const osuapi = await osuRequest.sendRequest();
-
-        for (let i = 0; i < osuapi.length; i++) {
-            if (osuapi[i]["beatmap_id"] == mapid) {
-                mapHash = osuapi[i]["file_md5"];
-                mapName = osuapi[i]["artist"] + " - " + osuapi[i]["title"] + " (" + osuapi[i]["creator"] + ")" + " [" + osuapi[i]["version"] + "]";
-                mapsetid = osuapi[i]["beatmapset_id"];
-                break;
-            }
+        // 캐싱된 맵 정보가 있다면?
+        if(mapCache.has(mapid)) {
+            const information = mapCache.get(mapid);
+            mapHash = information["mapHash"];
+            mapName = information["mapName"];
+            mapsetid = information["mapSetId"];
         }
-
-        if (mapHash === undefined) {
-            RouterUtils.fail(res, logger, ErrorCodes.MAP_NOT_EXIST);
-            return;
+        // 없다면?
+        else {
+            const osuRequest = new Request(`https://osu.ppy.sh/api/get_beatmaps?k=${process.env.OSU_KEY}&b=${mapid}`);
+            const osuapi = await osuRequest.sendRequest();
+    
+            for (let i = 0; i < osuapi.length; i++) {
+                if (osuapi[i]["beatmap_id"] == mapid) {
+                    mapHash = osuapi[i]["file_md5"];
+                    mapName = osuapi[i]["artist"] + " - " + osuapi[i]["title"] + " (" + osuapi[i]["creator"] + ")" + " [" + osuapi[i]["version"] + "]";
+                    mapsetid = osuapi[i]["beatmapset_id"];
+                    mapCache.set(mapid, {
+                        mapHash: mapHash,
+                        mapName : mapName,
+                        mapSetId, mapsetid
+                    });
+                    break;
+                }
+            }
+    
+            if (mapHash === undefined) {
+                RouterUtils.fail(res, logger, ErrorCodes.MAP_NOT_EXIST);
+                return;
+            }
         }
 
         Records.create({
@@ -67,8 +79,6 @@ router.post('/', async (req, res) => {
             mapSetId: mapsetid,
             mapHash: mapHash
         });
-
-        // await MySQL.query('INSERT INTO results(id, uuid, map_id, mapset_id, map_hash, createdTime) VALUES(?, ?, ?, ?, ?, UNIX_TIMESTAMP())', playId, uuid, mapid, mapsetid, mapHash);
         
         let responseData = {
             "playId": playId,
