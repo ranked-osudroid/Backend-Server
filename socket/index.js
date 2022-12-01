@@ -1,5 +1,5 @@
-import testInit from './test.js';
+import init from './socket.js';
 
-export default function init() {
-    testInit();
+export default function socketInit() {
+    init();
 }
