@@ -85,8 +85,17 @@ export default class Match {
         this.rounds.push(round);
     }
 
-    
+    toJson() {
+        let jsonRounds = [];
+        for(let round of this.rounds) {
+            jsonRounds.push(round.toJson());
+        }
+        return {
+            id, startedTime, endedTime, blueUUID, redUUID, blueScore, redScore, mappool, aborted, rounds: jsonRounds
+        }
+    }
 
+    
 
 
 
